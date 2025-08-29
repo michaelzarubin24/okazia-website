@@ -1,7 +1,6 @@
 import { type SanityDocument } from "next-sanity";
 import { PortableText } from "@portabletext/react";
 import { client } from '../../../../sanity/client';
-import { urlFor } from '../../../../sanity/image';
 import { Play } from "lucide-react"; 
 import Link from 'next/link';
 

@@ -1,6 +1,5 @@
 import { type SanityDocument } from "next-sanity";
 import { client } from '../../sanity/client';
-import { urlFor } from '../../sanity/image';
 import Link from 'next/link';
 
 // This query fetches all posts and sorts them by publication date (newest first).
