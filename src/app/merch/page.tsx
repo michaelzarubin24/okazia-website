@@ -1,6 +1,7 @@
 import { type SanityDocument } from "next-sanity";
 import { client } from '../../sanity/client'; 
 import { urlFor } from '../../sanity/image';
+import Link from 'next/link';
 
 // This query fetches all merch products.
 const MERCH_QUERY = `*[_type == "merchProduct"]{
@@ -48,12 +49,12 @@ export default async function MerchPage() {
 
         {/* Call to Action */}
         <div className="mt-20 text-center">
-            <a 
+            <Link
                 href="/contacts"
                 className="inline-block bg-white text-black font-bold text-lg tracking-widest uppercase px-10 py-4 hover:bg-gray-200 transition-colors duration-300"
             >
                 ЗАМОВИТИ
-            </a>
+            </Link>
         </div>
       </div>
     </div>

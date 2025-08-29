@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { type SanityDocument } from 'next-sanity';
 import { client } from '../../sanity/client'; // Corrected import path
+import Link from 'next/link';
 
 // --- HELPER FUNCTION TO GET YOUTUBE THUMBNAIL ---
 const getYouTubeThumbnail = (url: string) => {
@@ -69,14 +70,14 @@ export default function VideosPage() {
             <p className="mt-4 text-lg max-w-2xl">
               Натисніть нижче, щоб переглянути повну версію на YouTube з найкращою якістю та звуком.
             </p>
-            <a
+            <Link
               href="https://www.youtube.com/watch?v=bMl_En4wSYo"
               target="_blank"
               rel="noopener noreferrer"
               className="mt-8 inline-block bg-white text-black font-bold text-lg tracking-widest uppercase px-10 py-4 hover:bg-gray-200 transition-colors duration-300"
             >
               Дивитись на YouTube
-            </a>
+            </Link>
         </div>
       </section>
 
@@ -88,7 +89,7 @@ export default function VideosPage() {
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {allVideos.map((video) => (
-              <a key={video._id} href={video.youtubeUrl} target="_blank" rel="noopener noreferrer" className="group">
+              <Link key={video._id} href={video.youtubeUrl} target="_blank" rel="noopener noreferrer" className="group">
                 <div className="aspect-video w-full bg-gray-800 rounded-lg overflow-hidden">
                   <img 
                     src={getYouTubeThumbnail(video.youtubeUrl)} 
@@ -97,7 +98,7 @@ export default function VideosPage() {
                   />
                 </div>
                 <p className="text-white font-semibold mt-3">{video.title}</p>
-              </a>
+              </Link>
             ))}
           </div>
         </div>

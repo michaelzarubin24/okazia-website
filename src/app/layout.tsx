@@ -2,11 +2,16 @@
 import "./globals.css";
 import { useState, useEffect } from 'react';
 import { Send, ChevronDown, ChevronUp, Menu, X } from 'lucide-react'; 
+import Link from 'next/link';
 
 type NavLink = {
-  name: string;
-  href?: string;
-  dropdown?: { name: string; href: string }[];
+    name: string;
+    href: string;
+    dropdown?: undefined;
+} | {
+    name: string;
+    href?: undefined;
+    dropdown: { name: string; href: string }[];
 };
 
 const Header = () => {
@@ -112,14 +117,14 @@ const Header = () => {
                             <div className="absolute top-full pt-2 w-48">
                               <div className="bg-black/80 backdrop-blur-sm rounded-md shadow-lg">
                                 {link.dropdown.map((item) => (
-                                  <a key={item.name} href={item.href} className="block px-4 py-2 text-white hover:bg-gray-700">{item.name}</a>
+                                  <Link key={item.name} href={item.href} className="block px-4 py-2 text-white hover:bg-gray-700">{item.name}</Link>
                                 ))}
                               </div>
                             </div>
                           )}
                         </div>
                       ) : (
-                        <a key={link.name} href={link.href} className="text-white text-base font-medium px-4 py-2 rounded-full hover:bg-white/10 transition-colors duration-300">{link.name}</a>
+                        <Link key={link.name} href={link.href} className="text-white text-base font-medium px-4 py-2 rounded-full hover:bg-white/10 transition-colors duration-300">{link.name}</Link>
                       )
                     ))}
                   </nav>
@@ -163,13 +168,13 @@ const Header = () => {
                 {openMobileDropdown === link.name && (
                   <div className="flex flex-col items-center space-y-2 mt-2">
                     {link.dropdown.map(item => (
-                      <a key={item.name} href={item.href} className="text-gray-400 text-xl hover:text-white" onClick={() => setIsMobileMenuOpen(false)}>{item.name}</a>
+                      <Link key={item.name} href={item.href} className="text-gray-400 text-xl hover:text-white" onClick={() => setIsMobileMenuOpen(false)}>{item.name}</Link>
                     ))}
                   </div>
                 )}
               </div>
             ) : (
-              <a key={link.name} href={link.href} className="text-white text-2xl font-bold uppercase hover:text-gray-300" onClick={() => setIsMobileMenuOpen(false)}>{link.name}</a>
+              <Link key={link.name} href={link.href} className="text-white text-2xl font-bold uppercase hover:text-gray-300" onClick={() => setIsMobileMenuOpen(false)}>{link.name}</Link>
             )
           ))}
         </nav>

@@ -2,6 +2,7 @@
 // This page will display contact information and a contact form.
 
 import { Mail } from 'lucide-react'; // Importing an icon
+import Link from 'next/link';
 
 export default function ContactsPage() {
   const headerHeight = '3.5rem';
@@ -36,13 +37,13 @@ export default function ContactsPage() {
           {/* Direct Email Section */}
           <div className="text-center mb-16">
             <h3 className="text-2xl font-bold mb-2">Наша електронна пошта</h3>
-            <a 
+            <Link
               href="mailto:okaziamusic@gmail.com"
               className="inline-flex items-center text-xl text-white hover:underline"
             >
               <Mail className="mr-2" size={20} />
               okaziamusic@gmail.com
-            </a>
+            </Link>
           </div>
 
           {/* Contact Form Section */}

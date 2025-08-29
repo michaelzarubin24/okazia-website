@@ -1,6 +1,7 @@
 import { type SanityDocument } from "next-sanity";
 import { client } from '../../../sanity/client'; 
 import { urlFor } from '../../../sanity/image';
+import Link from 'next/link';
 
 // This query fetches the album details and its list of tracks.
 const ALBUM_QUERY = `*[_type == "musicRelease" && slug.current == $slug][0]{
@@ -39,21 +40,21 @@ export default async function AlbumPage({ params }: { params: Promise<{ slug: st
             <img src={album.artworkUrl} alt={`Artwork for ${album.title}`} className="w-full h-full object-cover" />
           </div>
           <h1 className="text-4xl md:text-6xl font-extrabold uppercase tracking-wider mt-8">{album.title}</h1>
-          <a 
-            href={album.smartLink} 
-            target="_blank" 
-            rel="noopener noreferrer" 
+          <Link
+            href={album.smartLink}
+            target="_blank"
+            rel="noopener noreferrer"
             className="mt-6 inline-block bg-white text-black font-bold py-3 px-8 rounded-lg hover:bg-gray-200 transition-colors uppercase tracking-wider"
           >
             Слухати
-          </a>
+          </Link>
         </div>
       </section>
 
       {/* Tracks "Book Spine" Section */}
       <section className="flex flex-col">
         {album.tracks && album.tracks.map((track: any) => (
-          <a
+          <Link
             key={track._id}
             href={`/music/track/${track.slug}`}
             className="group relative block w-full h-32 overflow-hidden"
@@ -63,7 +64,7 @@ export default async function AlbumPage({ params }: { params: Promise<{ slug: st
                 {track.title}
               </h2>
             </div>
-          </a>
+          </Link>
         ))}
       </section>
     </div>

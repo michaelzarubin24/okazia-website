@@ -1,6 +1,7 @@
 import { type SanityDocument } from "next-sanity";
 import { client } from '../../sanity/client';
 import { urlFor } from '../../sanity/image';
+import Link from 'next/link';
 
 // This query fetches all posts and sorts them by publication date (newest first).
 const POSTS_QUERY = `*[_type == "post"]|order(publishedAt desc){
@@ -24,7 +25,7 @@ export default async function NewsPage() {
 
         <div className="max-w-3xl mx-auto space-y-12">
           {posts.map((post) => (
-            <a key={post._id} href={`/news/${post.slug}`} className="block group">
+            <Link key={post._id} href={`/news/${post.slug}`} className="block group">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
                 {/* Image */}
                 {post.mainImageUrl && (
@@ -44,7 +45,7 @@ export default async function NewsPage() {
                   <h2 className="text-2xl font-bold group-hover:underline">{post.title}</h2>
                 </div>
               </div>
-            </a>
+            </Link>
           ))}
         </div>
       </div>

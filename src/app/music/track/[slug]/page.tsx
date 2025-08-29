@@ -3,6 +3,7 @@ import { PortableText } from "@portabletext/react";
 import { client } from '../../../../sanity/client';
 import { urlFor } from '../../../../sanity/image';
 import { Play } from "lucide-react"; 
+import Link from 'next/link';
 
 // This query finds the specific track by its slug, and also finds the release it belongs to.
 const TRACK_QUERY = `*[_type == "track" && slug.current == $slug][0]{
@@ -42,15 +43,15 @@ export default async function TrackPage({ params }: { params: Promise<{ slug: st
               alt={`Artwork for ${track.release.title}`}
               className="w-full h-auto aspect-square object-cover rounded-lg shadow-2xl"
             />
-            <a 
-              href={track.release.smartLink} 
-              target="_blank" 
-              rel="noopener noreferrer" 
+            <Link
+              href={track.release.smartLink}
+              target="_blank"
+              rel="noopener noreferrer"
               className="mt-6 inline-flex items-center justify-center space-x-2 w-full text-center bg-transparent border-2 border-white text-white font-bold py-3 px-6 rounded-lg hover:bg-white hover:text-black transition-colors uppercase tracking-wider text-base"
             >
               <Play size={18} />
               <span>Слухати</span>
-            </a>
+            </Link>
           </div>
 
           {/* Right Column: Details */}

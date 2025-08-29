@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { type SanityDocument } from 'next-sanity';
 import { ChevronLeft, ChevronRight, Play } from 'lucide-react';
 import { client } from '../sanity/client'; // Corrected import path
+import Link from 'next/link';
 
 // --- HELPER FUNCTION TO GET YOUTUBE THUMBNAIL ---
 const getYouTubeThumbnail = (url: string) => {
@@ -38,9 +39,9 @@ const FutureGigs = ({ gigs }: { gigs: SanityDocument[] }) => {
                 <p className="text-lg text-gray-400">{gig.venue}, {gig.city}</p>
                 <div className="mt-6">
                   {gig.ticketsUrl ? (
-                    <a href={gig.ticketsUrl} target="_blank" rel="noopener noreferrer" className="inline-block w-full sm:w-auto text-center bg-white text-black font-bold uppercase tracking-wider px-8 py-3 rounded-md hover:bg-gray-200 transition-colors">Квитки</a>
+                    <Link href={gig.ticketsUrl} target="_blank" rel="noopener noreferrer" className="inline-block w-full sm:w-auto text-center bg-white text-black font-bold uppercase tracking-wider px-8 py-3 rounded-md hover:bg-gray-200 transition-colors">Квитки</Link>
                   ) : (
-                    <a href={`/gigs/archive/${gig.slug}`} className="inline-block w-full sm:w-auto text-center bg-gray-600 text-white font-bold uppercase tracking-wider px-8 py-3 rounded-md hover:bg-gray-500 transition-colors">Деталі</a>
+                    <Link href={`/gigs/archive/${gig.slug}`} className="inline-block w-full sm:w-auto text-center bg-gray-600 text-white font-bold uppercase tracking-wider px-8 py-3 rounded-md hover:bg-gray-500 transition-colors">Деталі</Link>
                   )}
                 </div>
               </div>
@@ -89,15 +90,15 @@ const LatestReleasesCarousel = ({ releases }: { releases: SanityDocument[] }) =>
             
             return (
               <div key={release._id} className="flex-shrink-0 px-2 md:px-3 group flex flex-col items-center" style={{ width: `${100 / slidesToShow}%`}}>
-                <a href={linkHref} className="block w-full">
+                <Link href={linkHref} className="block w-full">
                   <div className="relative aspect-square w-full bg-gray-800 rounded-lg overflow-hidden transform transition-transform duration-300 group-hover:scale-105">
                     <img src={release.artworkUrl} alt={release.title} className="w-full h-full object-cover" />
                     <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center p-4">
                       <h3 className="text-white font-bold text-center text-lg sm:text-xl">{release.title}</h3>
                     </div>
                   </div>
-                </a>
-                <a href={release.smartLink} target="_blank" rel="noopener noreferrer" className="mt-4 inline-flex items-center justify-center space-x-2 w-full text-center bg-white/10 text-white font-bold py-2 px-4 rounded-lg hover:bg-white/20 transition-colors uppercase tracking-wider text-sm"><Play size={16} /><span>Слухати</span></a>
+                </Link>
+                <Link href={release.smartLink} target="_blank" rel="noopener noreferrer" className="mt-4 inline-flex items-center justify-center space-x-2 w-full text-center bg-white/10 text-white font-bold py-2 px-4 rounded-lg hover:bg-white/20 transition-colors uppercase tracking-wider text-sm"><Play size={16} /><span>Слухати</span></Link>
               </div>
             )
           })}
@@ -114,19 +115,19 @@ const OtherVideosCarousel = ({ videos }: { videos: SanityDocument[] }) => {
         <div className="mt-16">
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                 {videos.slice(0, 8).map((video) => (
-                    <a key={video._id} href={video.youtubeUrl} target="_blank" rel="noopener noreferrer" className="group">
+                    <Link key={video._id} href={video.youtubeUrl} target="_blank" rel="noopener noreferrer" className="group">
                         <div className="aspect-video w-full bg-gray-800 rounded-lg overflow-hidden">
                             <img src={getYouTubeThumbnail(video.youtubeUrl)} alt={video.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
                         </div>
                         <p className="text-white font-semibold mt-2 truncate">{video.title}</p>
-                    </a>
+                    </Link>
                 ))}
             </div>
             {videos.length > 8 && (
                 <div className="mt-12 text-center">
-                    <a href="/videos" className="inline-block bg-transparent border-2 border-white text-white font-bold text-lg tracking-widest uppercase px-10 py-4 hover:bg-white hover:text-black transition-colors duration-300">
+                    <Link href="/videos" className="inline-block bg-transparent border-2 border-white text-white font-bold text-lg tracking-widest uppercase px-10 py-4 hover:bg-white hover:text-black transition-colors duration-300">
                         ПЕРЕГЛЯНУТИ ВСІ
-                    </a>
+                    </Link>
                 </div>
             )}
         </div>
@@ -139,13 +140,13 @@ const LatestNewsCarousel = ({ posts }: { posts: SanityDocument[] }) => {
     return (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {posts.map((post) => (
-                <a key={post._id} href={`/news/${post.slug}`} className="group">
+                <Link key={post._id} href={`/news/${post.slug}`} className="group">
                     <div className="aspect-video w-full bg-gray-800 rounded-lg overflow-hidden">
                         <img src={post.mainImageUrl} alt={post.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
                     </div>
                     <p className="text-gray-400 text-sm mt-4">{new Date(post.publishedAt).toLocaleDateString('uk-UA', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
                     <h3 className="text-white text-xl font-bold mt-2 group-hover:underline">{post.title}</h3>
-                </a>
+                </Link>
             ))}
         </div>
     );
@@ -247,7 +248,7 @@ export default function Home() {
             <div className="absolute inset-0 bg-black opacity-40"></div>
             <div className="relative z-10 h-full flex flex-col items-center justify-center text-center text-white p-4 sm:p-8">
                 <h3 className="text-2xl sm:text-3xl md:text-4xl font-extrabold uppercase tracking-wider">ЦИКЛ (MUSIC VIDEO)</h3>
-                <a href="https://www.youtube.com/watch?v=bMl_En4wSYo" target="_blank" rel="noopener noreferrer" className="mt-6 inline-block bg-white text-black font-bold text-base sm:text-lg tracking-widest uppercase px-6 py-3 sm:px-8 sm:py-3 hover:bg-gray-200 transition-colors duration-300">Дивитись на YouTube</a>
+                <Link href="https://www.youtube.com/watch?v=bMl_En4wSYo" target="_blank" rel="noopener noreferrer" className="mt-6 inline-block bg-white text-black font-bold text-base sm:text-lg tracking-widest uppercase px-6 py-3 sm:px-8 sm:py-3 hover:bg-gray-200 transition-colors duration-300">Дивитись на YouTube</Link>
             </div>
           </div>
           <OtherVideosCarousel videos={otherVideos} />
@@ -263,7 +264,7 @@ export default function Home() {
                   <p className="mt-4 text-lg sm:text-xl uppercase tracking-widest">НА ПІДТРИМКУ БРИТАНСЬКОГО ГУРТУ</p>
               </div>
                <div className="mt-8">
-                <a href="/news/pershii-tur-ukrayinoyu-razom-z-hardwicke-circus" className="inline-block bg-transparent border-2 border-white text-white font-bold text-base sm:text-lg tracking-widest uppercase px-8 py-3 sm:px-10 sm:py-4 hover:bg-white hover:text-black transition-colors duration-300">ЧИТАТИ</a>
+                <Link href="/news/pershii-tur-ukrayinoyu-razom-z-hardwicke-circus" className="inline-block bg-transparent border-2 border-white text-white font-bold text-base sm:text-lg tracking-widest uppercase px-8 py-3 sm:px-10 sm:py-4 hover:bg-white hover:text-black transition-colors duration-300">ЧИТАТИ</Link>
               </div>
           </div>
       </section>
@@ -275,7 +276,7 @@ export default function Home() {
               <div className="text-center text-white max-w-2xl mb-8 sm:mb-12">
                   <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold uppercase tracking-wider">СОЛЬНИЙ КОНЦЕРТ В ART AREA ДК</h2>
                   <p className="mt-4 text-base sm:text-lg">Наш перший великий сольний концерт відбувся 6 червня 2025 року в культурному просторі ART AREA ДК!</p>
-                  <a href="/news/colnii-koncert-v-art-area-dk" className="mt-8 inline-block bg-transparent border-2 border-white text-white font-bold text-base sm:text-lg tracking-widest uppercase px-8 py-3 sm:px-10 sm:py-4 hover:bg-white hover:text-black transition-colors duration-300">ЧИТАТИ</a>
+                  <Link href="/news/colnii-koncert-v-art-area-dk" className="mt-8 inline-block bg-transparent border-2 border-white text-white font-bold text-base sm:text-lg tracking-widest uppercase px-8 py-3 sm:px-10 sm:py-4 hover:bg-white hover:text-black transition-colors duration-300">ЧИТАТИ</Link>
               </div>
           </div>
       </section>
@@ -288,9 +289,9 @@ export default function Home() {
           </h2>
           <LatestNewsCarousel posts={latestPosts} />
           <div className="mt-12">
-            <a href="/news" className="inline-block bg-transparent border-2 border-white text-white font-bold text-lg tracking-widest uppercase px-10 py-4 hover:bg-white hover:text-black transition-colors duration-300">
+            <Link href="/news" className="inline-block bg-transparent border-2 border-white text-white font-bold text-lg tracking-widest uppercase px-10 py-4 hover:bg-white hover:text-black transition-colors duration-300">
               ПЕРЕГЛЯНУТИ ВСІ
-            </a>
+            </Link>
           </div>
         </div>
       </section>

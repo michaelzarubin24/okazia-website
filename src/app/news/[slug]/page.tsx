@@ -3,6 +3,7 @@ import { PortableText } from "@portabletext/react";
 import { client } from '../../../sanity/client';
 import { urlFor } from '../../../sanity/image';
 
+
 const POST_QUERY = `*[_type == "post" && slug.current == $slug][0]{
   _id,
   title,

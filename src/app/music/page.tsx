@@ -1,5 +1,6 @@
 import { type SanityDocument } from "next-sanity";
 import { client } from '../../sanity/client'; 
+import Link from 'next/link';
 
 // This query now checks if a release is a single or an album.
 const RELEASES_QUERY = `*[_type == "musicRelease"]|order(order asc){
@@ -25,7 +26,7 @@ export default async function MusicPage() {
           : `/music/track/${release.singleTrackSlug}`;
 
         return (
-          <a
+          <Link
             key={release._id}
             href={href}
             className="group relative block w-full h-48 overflow-hidden"
@@ -39,7 +40,7 @@ export default async function MusicPage() {
                 {release.title}
               </h2>
             </div>
-          </a>
+          </Link>
         );
       })}
     </div>

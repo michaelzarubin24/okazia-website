@@ -5,6 +5,7 @@ import { type SanityDocument } from "next-sanity";
 import { PortableText } from "@portabletext/react";
 import { client } from '../../../../sanity/client';
 import { urlFor } from '../../../../sanity/image';
+import Link from 'next/link';
 
 // This query fetches all the details for a specific gig.
 const GIG_DETAIL_QUERY = `*[_type == "gig" && slug.current == $slug][0]{
@@ -129,10 +130,10 @@ export default async function GigDetailPage({ params }: { params: Promise<{ slug
             <h2 className="text-3xl font-bold text-center mb-8">Більше концертів</h2>
             <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-4">
                {relatedGigs.map((relatedGig: SanityDocument) => (
-                 <a key={relatedGig.slug} href={`/gigs/archive/${relatedGig.slug}`} className="block p-4 bg-gray-800/50 rounded-lg hover:bg-gray-700/50 transition-colors text-center">
+                 <Link key={relatedGig.slug} href={`/gigs/archive/${relatedGig.slug}`} className="block p-4 bg-gray-800/50 rounded-lg hover:bg-gray-700/50 transition-colors text-center">
                    <p className="font-bold">{relatedGig.title}</p>
                    <p className="text-sm text-gray-400">{new Date(relatedGig.date).toLocaleDateString('uk-UA', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
-                 </a>
+                 </Link>
                ))}
             </div>
         </section>

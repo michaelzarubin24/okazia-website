@@ -3,6 +3,7 @@
 
 import { type SanityDocument } from "next-sanity";
 import { client } from '../../sanity/client'; 
+import Link from 'next/link';
 
 const MEMBERS_QUERY = `*[_type == "bandMember"]|order(order asc){
   _id,
@@ -29,10 +30,10 @@ export default async function AboutPage() {
       */}
       <div className="grid grid-cols-1 md:grid-cols-2">
         {bandMembers.map((member) => (
-          <a 
-            key={member._id} 
-            href={`/about/${member.slug}`} 
-            // On mobile, each item is full screen height. 
+          <Link
+            key={member._id}
+            href={`/about/${member.slug}`}
+            // On mobile, each item is full screen height.
             // On desktop, it uses the calculated height to fit perfectly.
             className="group relative w-full h-screen md:h-auto overflow-hidden bg-black"
             style={{ height: '100vh' }}
@@ -46,7 +47,7 @@ export default async function AboutPage() {
                 {member.name}
               </h3>
             </div>
-          </a>
+          </Link>
         ))}
       </div>
     </div>

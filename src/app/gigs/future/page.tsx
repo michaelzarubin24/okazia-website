@@ -3,6 +3,7 @@
 
 import { type SanityDocument } from "next-sanity";
 import { client } from '../../../sanity/client'; 
+import Link from 'next/link';
 
 // UPDATED: The query now also fetches the 'detailsUrl'.
 const FUTURE_GIGS_QUERY = `*[_type == "gig" && date >= now()]|order(date asc){
@@ -39,32 +40,32 @@ export default async function FutureGigsPage() {
                 {/* UPDATED: New logic for the button */}
                 {gig.ticketsUrl ? (
                   // If there's a ticket link, show the "Tickets" button
-                  <a 
+                  <Link
                     href={gig.ticketsUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="w-full sm:w-auto text-center bg-white text-black font-bold uppercase tracking-wider px-8 py-3 rounded-md hover:bg-gray-200 transition-colors"
                   >
                     Квитки
-                  </a>
+                  </Link>
                 ) : gig.detailsUrl ? (
                   // Otherwise, if there's a details link, show the "Details" button linking to it
-                  <a 
+                  <Link
                     href={gig.detailsUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="w-full sm:w-auto text-center bg-gray-600 text-white font-bold uppercase tracking-wider px-8 py-3 rounded-md hover:bg-gray-500 transition-colors"
                   >
                     Деталі
-                  </a>
+                  </Link>
                 ) : (
                   // As a fallback, if neither link exists, link to the archive page
-                  <a 
+                  <Link
                     href={`/gigs/archive/${gig.slug}`}
                     className="w-full sm:w-auto text-center bg-gray-600 text-white font-bold uppercase tracking-wider px-8 py-3 rounded-md hover:bg-gray-500 transition-colors"
                   >
                     Деталі
-                  </a>
+                  </Link>
                 )}
               </div>
             ))}
