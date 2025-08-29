@@ -40,12 +40,13 @@ const ALL_GIGS_QUERY = `*[_type == "gig" && defined(slug.current)]|order(date de
   "slug": slug.current
 }`;
 
-export default async function GigDetailPage({ params }: { params: { slug: string } }) {
+export default async function GigDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   // Simplified params handling as Next.js 13+ passes resolved params directly
-  const gig = await client.fetch<SanityDocument>(GIG_DETAIL_QUERY, { slug: params.slug });
+  const resolvedParams = await params;
+  const gig = await client.fetch<SanityDocument>(GIG_DETAIL_QUERY, { slug: resolvedParams.slug });
   const allGigs = await client.fetch<SanityDocument[]>(ALL_GIGS_QUERY);
-  
-  const relatedGigs = allGigs.filter(g => g.slug !== params.slug).slice(0, 3);
+
+  const relatedGigs = allGigs.filter(g => g.slug !== resolvedParams.slug).slice(0, 3);
 
   if (!gig) {
     return <div className="pt-24 text-center">Концерт не знайдено.</div>;
