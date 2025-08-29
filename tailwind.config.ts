@@ -9,6 +9,10 @@ const config: Config = {
   theme: {
     extend: {},
   },
-  plugins: [require('@tailwindcss/aspect-ratio')],
+  // UPDATED: Added the aspect-ratio and typography plugins
+  plugins: [
+    require('@tailwindcss/aspect-ratio'),
+    require('@tailwindcss/typography'),
+  ],
 };
 export default config;

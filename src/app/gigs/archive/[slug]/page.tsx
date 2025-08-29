@@ -1,72 +1,67 @@
-// Placeholder data for all your past gigs. This will eventually come from a CMS.
-const allPastGigs = [
-    {
-      slug: "artdacha-2025-06-06",
-      title: "Сольний концерт в ART AREA ДК",
-      mainImageUrl: "/images/gig-images/solo-concert-1.jpg",
-      date: "June 6, 2025",
-      venue: "ART AREA ДК",
-      city: "Харків, Україна",
-      setlist: `1. Мавка
-2. Чугайстер
-3. Повітруля
-4. Сновида
-5. Відьма
-6. Вовкулака
-7. Мольфар
-8. Купала
-9. Цикл
-10. Немов тінь
-11. Шрами
-12. Не чекаю
-13. Осудні софіти
-14. Не спиняюсь
-15. Твій постріл`,
-      interestingFacts: "Наш перший сольний концерт у Харкові в ART AREA ДК, де ми вперше виконали багато нових пісень! ",
-      photoGallery: [
-        "/images/gig-images/solo-concert-1.jpg",
-        "/images/gig-images/solo-concert-2.jpg",
-        "/images/gig-images/solo-concert-3.jpg",
-        "/images/gig-images/solo-concert-4.jpg",
-      ],
-      // youtubeUrl: "https://www.youtube.com/embed/GlgQ0SFKyH0", // Optional
-    },
-    // Add other past gigs here...
-];
+// FILE: src/app/gigs/archive/[slug]/page.tsx
+// This is the template for an individual past gig page, connected to Sanity.
 
-export default function GigDetailPage({ params }: { params: { slug: string } }) {
-  const gig = allPastGigs.find(g => g.slug === params.slug);
+import { type SanityDocument } from "next-sanity";
+import { PortableText } from "@portabletext/react";
+import { client } from '../../../../sanity/client';
+import { urlFor } from '../../../../sanity/image';
+
+// This query fetches all the details for a specific gig.
+const GIG_DETAIL_QUERY = `*[_type == "gig" && slug.current == $slug][0]{
+  _id,
+  title,
+  date,
+  venue,
+  city,
+  "mainImageUrl": mainImageUrl.asset->url,
+  "posterImageUrl": posterImageUrl.asset->url,
+  setlist,
+  interestingFacts,
+  photoGallery,
+  youtubeUrl
+}`;
+
+// This query fetches all gigs to create the "related gigs" list.
+const ALL_GIGS_QUERY = `*[_type == "gig" && defined(slug.current)]|order(date desc){
+  _id,
+  title,
+  date,
+  "slug": slug.current
+}`;
+
+
+export default async function GigDetailPage({ params }: { params: Promise<{ slug: string }> }) {
+  const resolvedParams = await params;
+  const gig = await client.fetch<SanityDocument>(GIG_DETAIL_QUERY, { slug: resolvedParams.slug });
+  const allGigs = await client.fetch<SanityDocument[]>(ALL_GIGS_QUERY);
   
-  // Filter for related gigs (e.g., all other gigs except the current one)
-  const relatedGigs = allPastGigs.filter(g => g.slug !== params.slug).slice(0, 3);
+  // Exclude the current gig and take the next 3 for the "related" section.
+  const relatedGigs = allGigs.filter(g => g.slug !== resolvedParams.slug).slice(0, 3);
 
   if (!gig) {
-    return <div className="pt-24 text-center">Gig not found.</div>;
+    return <div className="pt-24 text-center">Концерт не знайдено.</div>;
   }
 
-  const headerHeight = '3.5rem';
+  const headerHeight = '4.4rem';
 
   return (
     <div style={{ paddingTop: headerHeight }}>
-      {/* 1. & 2. Gig Title and Main Image */}
       <section 
         className="relative h-[60vh] w-full flex items-center justify-center text-center bg-cover bg-center"
         style={{ backgroundImage: `url(${gig.mainImageUrl})` }}
       >
         <div className="absolute inset-0 bg-black/60"></div>
-        <div className="relative z-10 text-white">
-          <p className="text-lg mb-2">{gig.date}</p>
+        <div className="relative z-10 text-white p-4">
+          <p className="text-lg mb-2">{new Date(gig.date).toLocaleDateString('uk-UA', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
           <h1 className="text-4xl md:text-6xl font-extrabold uppercase tracking-wider">{gig.title}</h1>
         </div>
       </section>
 
       <div className="container mx-auto px-6 sm:px-8 md:px-12 py-12 md:py-20">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-          {/* Left Column: Setlist & Facts */}
           <div className="lg:col-span-2">
-            {/* 4. Setlist */}
             <section>
-              <h2 className="text-3xl font-bold mb-4">Setlist</h2>
+              <h2 className="text-3xl font-bold mb-4">Сетлист</h2>
               <div className="bg-gray-800/50 p-6 rounded-lg">
                 <p className="text-gray-300 text-lg leading-loose whitespace-pre-wrap font-mono">
                   {gig.setlist}
@@ -74,50 +69,50 @@ export default function GigDetailPage({ params }: { params: { slug: string } }) 
               </div>
             </section>
 
-            {/* 5. Interesting Facts */}
             <section className="mt-12">
-              <h2 className="text-3xl font-bold mb-4">Memories</h2>
-              <p className="text-gray-300 text-lg leading-relaxed">
-                {gig.interestingFacts}
-              </p>
+              <h2 className="text-3xl font-bold mb-4">Цікаві факти</h2>
+              <div className="prose prose-invert lg:prose-xl text-gray-300 leading-relaxed">
+                <PortableText value={gig.interestingFacts} />
+              </div>
             </section>
           </div>
 
-          {/* Right Column: Related Gigs */}
           <aside className="lg:sticky lg:top-24 h-fit">
-             <h3 className="text-2xl font-bold mb-4">More Gigs</h3>
-             <div className="space-y-4">
-               {relatedGigs.map(relatedGig => (
-                 <a key={relatedGig.slug} href={`/gigs/archive/${relatedGig.slug}`} className="block p-4 bg-gray-800/50 rounded-lg hover:bg-gray-700/50 transition-colors">
-                   <p className="font-bold">{relatedGig.title}</p>
-                   <p className="text-sm text-gray-400">{relatedGig.date}</p>
-                 </a>
-               ))}
-             </div>
+             {gig.posterImageUrl && (
+                <div>
+                    <h3 className="text-2xl font-bold mb-4">Постер</h3>
+                    <div className="relative aspect-[2/3] w-full bg-gray-800/50 rounded-lg">
+                        <img 
+                            src={gig.posterImageUrl} 
+                            alt={`Poster for ${gig.title}`}
+                            className="object-contain rounded-lg shadow-2xl w-full h-full"
+                        />
+                    </div>
+                </div>
+             )}
           </aside>
         </div>
 
-        {/* 6. Photo Carousel */}
-        <section className="mt-12">
-          <h2 className="text-3xl font-bold text-center mb-8">Photo Gallery</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {gig.photoGallery.map((photo, index) => (
-              <div key={index} className="aspect-w-4 aspect-h-3 rounded-lg overflow-hidden shadow-lg">
-                {/* UPDATED: Replaced Next.js <Image> with standard <img> tag */}
-                <img 
-                  src={photo} 
-                  alt={`Gig photo ${index + 1}`} 
-                  className="w-full h-full object-cover" 
-                />
-              </div>
-            ))}
-          </div>
-        </section>
+        {gig.photoGallery && gig.photoGallery.length > 0 && (
+            <section className="mt-12">
+            <h2 className="text-3xl font-bold text-center mb-8">Фотогалерея</h2>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {gig.photoGallery.map((photo: any, index: number) => (
+                <div key={index} className="aspect-w-4 aspect-h-3 rounded-lg overflow-hidden shadow-lg">
+                    <img 
+                    src={urlFor(photo).url()} 
+                    alt={`Gig photo ${index + 1}`} 
+                    className="w-full h-full object-cover" 
+                    />
+                </div>
+                ))}
+            </div>
+            </section>
+        )}
 
-        {/* 7. YouTube Video (Optional) */}
-        {/* {gig.youtubeUrl && (
+        {gig.youtubeUrl && (
           <section className="mt-12">
-            <h2 className="text-3xl font-bold text-center mb-8">Live Video</h2>
+            <h2 className="text-3xl font-bold text-center mb-8">Відео</h2>
             <div className="aspect-w-16 aspect-h-9 max-w-4xl mx-auto rounded-lg overflow-hidden shadow-2xl">
               <iframe 
                 src={gig.youtubeUrl}
@@ -128,7 +123,19 @@ export default function GigDetailPage({ params }: { params: { slug: string } }) 
               ></iframe>
             </div>
           </section>
-        )} */}
+        )}
+
+        <section className="mt-16">
+            <h2 className="text-3xl font-bold text-center mb-8">Більше концертів</h2>
+            <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-4">
+               {relatedGigs.map((relatedGig: SanityDocument) => (
+                 <a key={relatedGig.slug} href={`/gigs/archive/${relatedGig.slug}`} className="block p-4 bg-gray-800/50 rounded-lg hover:bg-gray-700/50 transition-colors text-center">
+                   <p className="font-bold">{relatedGig.title}</p>
+                   <p className="text-sm text-gray-400">{new Date(relatedGig.date).toLocaleDateString('uk-UA', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                 </a>
+               ))}
+            </div>
+        </section>
       </div>
     </div>
   );
