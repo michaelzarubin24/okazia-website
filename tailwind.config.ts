@@ -11,7 +11,6 @@ const config: Config = {
   },
   // UPDATED: Added the aspect-ratio and typography plugins
   plugins: [
-    require('@tailwindcss/aspect-ratio'),
     require('@tailwindcss/typography'),
   ],
 };
