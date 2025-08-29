@@ -1,5 +1,5 @@
 // FILE: src/app/about/page.tsx
-// This page now dynamically displays all band members from Sanity in full-screen rows.
+// This page now dynamically displays all band members from Sanity and is mobile-friendly.
 
 import { type SanityDocument } from "next-sanity";
 import { client } from '../../sanity/client'; 
@@ -14,44 +14,41 @@ const MEMBERS_QUERY = `*[_type == "bandMember"]|order(order asc){
 export default async function AboutPage() {
   const bandMembers = await client.fetch<SanityDocument[]>(MEMBERS_QUERY);
   
-  // Helper function to group members into pairs for each row
-  const memberPairs = [];
-  for (let i = 0; i < bandMembers.length; i += 2) {
-    memberPairs.push(bandMembers.slice(i, i + 2));
-  }
+  // The height of your header on desktop (4rem = 16 in Tailwind's spacing scale)
+  const headerHeightDesktop = '4rem'; 
+  // Each row on desktop should take up half the viewport height minus half the header height
+  const desktopRowHeight = `calc(50vh - (${headerHeightDesktop} / 2))`;
 
   return (
-    // UPDATED: Removed the paddingTop style from this container.
-    <div>
-      {/* We now map over the pairs to create a section for each row */}
-      {memberPairs.map((pair, index) => (
-        <section 
-          key={index} 
-          className="flex" 
-          // UPDATED: Each section now takes up the full 100vh to go under the header.
-          style={{ height: '100vh' }}
-        >
-          {pair.map((member) => (
-            <a 
-              key={member._id} 
-              href={`/about/${member.slug}`} 
-              className="group relative w-1/2 overflow-hidden bg-black border border-black"
-            >
-              <div
-                style={{ backgroundImage: `url(${member.imageUrl})` }}
-                className="h-full w-full bg-cover bg-no-repeat bg-center transition-all duration-500 ease-in-out group-hover:scale-105"
-              />
-              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-500 ease-in-out flex items-center justify-center">
-                <h3 className="text-white text-3xl font-bold uppercase tracking-widest">
-                  {member.name}
-                </h3>
-              </div>
-            </a>
-          ))}
-          {/* This handles the case where there's an odd number of members */}
-          {pair.length === 1 && <div className="w-1/2 bg-black border border-black" />}
-        </section>
-      ))}
+    // On medium screens and up, we add padding-top to push the content below the header.
+    // On mobile, there is no padding, so the content goes under the header.
+    <div className="md:pt-[4rem]">
+      {/* This is now a single grid container.
+        - On mobile (default): It's a single column (grid-cols-1).
+        - On medium screens and up (md): It becomes a two-column grid (md:grid-cols-2).
+      */}
+      <div className="grid grid-cols-1 md:grid-cols-2">
+        {bandMembers.map((member) => (
+          <a 
+            key={member._id} 
+            href={`/about/${member.slug}`} 
+            // On mobile, each item is full screen height. 
+            // On desktop, it uses the calculated height to fit perfectly.
+            className="group relative w-full h-screen md:h-auto overflow-hidden bg-black"
+            style={{ height: '100vh' }}
+          >
+            <div
+              style={{ backgroundImage: `url(${member.imageUrl})` }}
+              className="h-full w-full bg-cover bg-no-repeat bg-center transition-all duration-500 ease-in-out group-hover:scale-105"
+            />
+            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-500 ease-in-out flex items-center justify-center">
+              <h3 className="text-white text-3xl font-bold uppercase tracking-widest">
+                {member.name}
+              </h3>
+            </div>
+          </a>
+        ))}
+      </div>
     </div>
   );
 }
