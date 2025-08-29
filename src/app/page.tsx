@@ -24,9 +24,7 @@ const FutureGigs = ({ gigs }: { gigs: SanityDocument[] }) => {
   return (
     <section className="py-16 sm:py-24 bg-black">
       <div className="container mx-auto px-4 text-center">
-        <h2 className="text-3xl sm:text-4xl font-bold mb-12">
-          ————  АНОНСИ  ————
-        </h2>
+        <h2 className="text-3xl sm:text-4xl font-bold mb-12">АНОНСИ</h2>
         <div className="max-w-4xl mx-auto space-y-8">
           {gigs.map((gig) => (
             <div key={gig._id} className="flex flex-col md:flex-row items-center gap-8 p-6 bg-gray-800/50 rounded-lg">
@@ -232,14 +230,14 @@ export default function Home() {
 
       <section className="py-16 sm:py-24 bg-black">
         <div className="container mx-auto px-4 text-center">
-            <h2 className="text-3xl sm:text-4xl font-bold mb-12">————  МУЗИКА  ————</h2>
+            <h2 className="text-3xl sm:text-4xl font-bold mb-12">МУЗИКА</h2>
             <LatestReleasesCarousel releases={latestReleases} />
         </div>
       </section>
 
       <section className="py-16 sm:py-24 bg-black">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl sm:text-4xl font-bold mb-12">————  ВІДЕО  ————</h2>
+          <h2 className="text-3xl sm:text-4xl font-bold mb-12">ВІДЕО</h2>
           <div className="relative h-[60vh] sm:h-[75vh] w-full overflow-hidden rounded-lg">
             <video ref={videoRef} autoPlay loop muted playsInline className="absolute top-0 left-0 w-full h-full object-cover">
               <source src="/videos/okazia-video.mp4" type="video/mp4" />
@@ -284,9 +282,7 @@ export default function Home() {
 
       <section className="py-16 sm:py-24 bg-black">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl sm:text-4xl font-bold mb-12">
-            ————  ІНШІ НОВИНИ  ————
-          </h2>
+          <h2 className="text-3xl sm:text-4xl font-bold mb-12">НОВИНИ</h2>
           <LatestNewsCarousel posts={latestPosts} />
           <div className="mt-12">
             <Link href="/news" className="inline-block bg-transparent border-2 border-white text-white font-bold text-lg tracking-widest uppercase px-10 py-4 hover:bg-white hover:text-black transition-colors duration-300">
