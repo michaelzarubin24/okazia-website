@@ -1,18 +1,16 @@
 // FILE: src/app/gigs/future/page.tsx
-// This page now fetches and displays a live list of upcoming shows from Sanity.
 
 import { type SanityDocument } from "next-sanity";
 import { client } from '../../../sanity/client'; 
 import Link from 'next/link';
 
-// UPDATED: The query now also fetches the 'detailsUrl'.
 const FUTURE_GIGS_QUERY = `*[_type == "gig" && date >= now()]|order(date asc){
   _id,
   date,
   venue,
   city,
   ticketsUrl,
-  detailsUrl, // Added this field
+  detailsUrl,
   "slug": slug.current
 }`;
 
@@ -37,9 +35,7 @@ export default async function FutureGigsPage() {
                   <p className="text-gray-400">{gig.venue}, {gig.city}</p>
                 </div>
                 
-                {/* UPDATED: New logic for the button */}
                 {gig.ticketsUrl ? (
-                  // If there's a ticket link, show the "Tickets" button
                   <Link
                     href={gig.ticketsUrl}
                     target="_blank"
@@ -49,7 +45,6 @@ export default async function FutureGigsPage() {
                     Квитки
                   </Link>
                 ) : gig.detailsUrl ? (
-                  // Otherwise, if there's a details link, show the "Details" button linking to it
                   <Link
                     href={gig.detailsUrl}
                     target="_blank"
@@ -59,7 +54,6 @@ export default async function FutureGigsPage() {
                     Деталі
                   </Link>
                 ) : (
-                  // As a fallback, if neither link exists, link to the archive page
                   <Link
                     href={`/gigs/archive/${gig.slug}`}
                     className="w-full sm:w-auto text-center bg-gray-600 text-white font-bold uppercase tracking-wider px-8 py-3 rounded-md hover:bg-gray-500 transition-colors"
@@ -71,8 +65,9 @@ export default async function FutureGigsPage() {
             ))}
           </div>
         ) : (
+          // CHANGE 1: Replaced the apostrophe in "зв'язку" with "&apos;"
           <p className="text-center text-gray-400 text-lg">
-            Запланованих концертів немає. Залишайтеся на зв'язку!
+            Запланованих концертів немає. Залишайтеся на зв&apos;язку!
           </p>
         )}
       </div>

@@ -1,12 +1,24 @@
 // FILE: src/app/bio/page.tsx
 // This page now fetches and displays live data for the band biography from Sanity.
 
+// src/app/bio/page.tsx
+
 import { type SanityDocument } from "next-sanity";
 import { PortableText } from "@portabletext/react";
 import { client } from '../../sanity/client';
 import { urlFor } from '../../sanity/image';
+import Image from 'next/image'; // CHANGE 1: Import the Next.js Image component
 
-// UPDATED: Query now fetches the photoGallery
+// CHANGE 2: Define a specific type for a photo in the gallery
+interface GalleryPhoto {
+  _key: string;
+  _type: 'image';
+  asset: {
+    _ref: string;
+    _type: 'reference';
+  };
+}
+
 const BIO_QUERY = `*[_type == "bio"][0]{
   title,
   "mainImageUrl": mainImage.asset->url,
@@ -15,6 +27,7 @@ const BIO_QUERY = `*[_type == "bio"][0]{
 }`;
 
 export default async function BioPage() {
+  // Use a more specific type for the fetched data if you have one, but SanityDocument is a good default
   const bio = await client.fetch<SanityDocument>(BIO_QUERY);
 
   if (!bio) {
@@ -51,12 +64,16 @@ export default async function BioPage() {
           {bio.photoGallery && bio.photoGallery.length > 0 && (
             <section className="mt-16 md:mt-24">
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                {bio.photoGallery.map((photo: any, index: number) => (
-                  <div key={index} className="aspect-square relative">
-                    <img 
+                {/* CHANGE 3: Use the GalleryPhoto interface instead of 'any' */}
+                {bio.photoGallery.map((photo: GalleryPhoto, index: number) => (
+                  <div key={photo._key || index} className="aspect-square relative">
+                    {/* CHANGE 4: Replace <img> with next/image's <Image> component */}
+                    <Image 
                       src={urlFor(photo).width(800).height(800).url()} 
                       alt={`Gallery photo ${index + 1}`}
+                      fill // Makes the image fill the parent div
                       className="w-full h-full object-cover rounded-lg shadow-lg"
+                      sizes="(max-width: 768px) 50vw, 33vw" // Helps optimize image loading based on viewport size
                     />
                   </div>
                 ))}

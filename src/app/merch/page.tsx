@@ -1,7 +1,10 @@
+// FILE: src/app/merch/page.tsx
+
 import { type SanityDocument } from "next-sanity";
 import { client } from '../../sanity/client'; 
-import { urlFor } from '../../sanity/image';
+// CHANGE 1: Removed unused 'urlFor' import
 import Link from 'next/link';
+import Image from 'next/image'; // CHANGE 2: Import the Next.js Image component
 
 // This query fetches all merch products.
 const MERCH_QUERY = `*[_type == "merchProduct"]{
@@ -25,18 +28,23 @@ export default async function MerchPage() {
           <p className="text-lg text-gray-400 max-w-2xl mx-auto">
             Підтримайте гурт і виглядайте добре, роблячи це! 
           </p>
-          <p className="text-lg text-gray-400 max-w-2xl mx-auto mb-16">Щоб замовити будь-який з наших товарів, будь ласка, зв'яжіться з нами через сторінку контактів!</p>
+          {/* CHANGE 3: Replaced the apostrophe in "зв'яжіться" with "&apos;" */}
+          <p className="text-lg text-gray-400 max-w-2xl mx-auto mb-16">Щоб замовити будь-який з наших товарів, будь ласка, зв&apos;яжіться з нами через сторінку контактів!</p>
         </div>
 
         {/* Merch Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {products.map((product) => (
             <div key={product._id} className="group">
-              <div className="aspect-square w-full bg-gray-800 rounded-lg overflow-hidden">
-                <img 
+              {/* CHANGE 4: Add 'relative' to the parent div */}
+              <div className="relative aspect-square w-full bg-gray-800 rounded-lg overflow-hidden">
+                {/* CHANGE 5: Replace <img> with <Image> */}
+                <Image 
                   src={product.imageUrl} 
                   alt={`Photo of ${product.name}`}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  fill
+                  className="object-cover group-hover:scale-105 transition-transform duration-300"
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                 />
               </div>
               <div className="mt-4 text-center">

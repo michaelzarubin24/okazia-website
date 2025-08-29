@@ -1,18 +1,16 @@
 // FILE: src/app/contacts/page.tsx
-// This page will display contact information and a contact form.
 
-import { Mail } from 'lucide-react'; // Importing an icon
+import { Mail } from 'lucide-react';
 import Link from 'next/link';
 
 export default function ContactsPage() {
   const headerHeight = '3.5rem';
 
   return (
-    // This main container holds the background image and the content.
     <div 
       className="relative min-h-screen w-full bg-cover bg-center"
       style={{ 
-        backgroundImage: "url('/images/contacts/contacts.jpg')", // <-- IMPORTANT: Add your background image path here
+        backgroundImage: "url('/images/contacts/contacts.jpg')",
         paddingTop: headerHeight 
       }}
     >
@@ -22,8 +20,6 @@ export default function ContactsPage() {
       {/* Content container */}
       <div className="relative z-10 container mx-auto px-4 py-12 md:py-20">
         
-        {/* Semi-transparent card for the content */}
-        {/* UPDATED: Changed max-w-4xl to max-w-3xl to make the entire card smaller */}
         <div className="max-w-2xl mx-auto bg-black/40 backdrop-blur-sm p-8 sm:p-12 rounded-lg">
           <div className="text-center">
             <h1 className="text-2xl sm:text-6xl font-extrabold uppercase tracking-wider mb-4">
@@ -34,7 +30,6 @@ export default function ContactsPage() {
             </p>
           </div>
 
-          {/* Direct Email Section */}
           <div className="text-center mb-16">
             <h3 className="text-2xl font-bold mb-2">Наша електронна пошта</h3>
             <Link
@@ -46,7 +41,6 @@ export default function ContactsPage() {
             </Link>
           </div>
 
-          {/* Contact Form Section */}
           <div className="max-w-lg mx-auto">
             <h3 className="text-2xl font-bold text-center mb-8">Надішліть повідомлення</h3>
             <form 
@@ -55,7 +49,8 @@ export default function ContactsPage() {
               className="space-y-6"
             >
               <div>
-                <label htmlFor="name" className="block text-sm font-medium text-gray-300">Ім'я</label>
+                {/* CHANGE 1: Replaced the apostrophe in "Ім'я" with "&apos;" */}
+                <label htmlFor="name" className="block text-sm font-medium text-gray-300">Ім&apos;я</label>
                 <input
                   type="text"
                   name="name"

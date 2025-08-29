@@ -1,8 +1,20 @@
+// FILE: src/app/news/[slug]/page.tsx
+
 import { type SanityDocument } from "next-sanity";
 import { PortableText } from "@portabletext/react";
 import { client } from '../../../sanity/client';
 import { urlFor } from '../../../sanity/image';
+import Image from 'next/image'; // CHANGE 1: Import the Next.js Image component
 
+// CHANGE 2: Define a specific type for a photo in the gallery
+interface GalleryPhoto {
+  _key: string;
+  _type: 'image';
+  asset: {
+    _ref: string;
+    _type: 'reference';
+  };
+}
 
 const POST_QUERY = `*[_type == "post" && slug.current == $slug][0]{
   _id,
@@ -13,12 +25,9 @@ const POST_QUERY = `*[_type == "post" && slug.current == $slug][0]{
   photoGallery
 }`;
 
-// UPDATED: The 'params' prop type is now a Promise.
-export default async function NewsPostPage({ params }: { params: Promise<{ slug: string }> }) {
-  // We first await the params to resolve them...
-  const { slug } = await params;
-  // ...then we can safely use the slug property.
-  const post = await client.fetch<SanityDocument>(POST_QUERY, { slug });
+export default async function NewsPostPage({ params }: { params: { slug: string } }) {
+  // Simplified params handling
+  const post = await client.fetch<SanityDocument>(POST_QUERY, { slug: params.slug });
 
   if (!post) {
     return <div className="pt-24 text-center">Post not found.</div>;
@@ -37,10 +46,14 @@ export default async function NewsPostPage({ params }: { params: Promise<{ slug:
           
           {post.mainImage && (
             <div className="relative w-full aspect-video mb-8">
-              <img 
+              {/* CHANGE 3: Replace main image <img> with <Image> and prioritize it */}
+              <Image 
                 src={urlFor(post.mainImage).url()} 
                 alt={`Image for ${post.title}`}
-                className="w-full h-full object-cover rounded-lg"
+                fill
+                priority // Main post image is critical for LCP
+                className="object-cover rounded-lg"
+                sizes="(max-width: 896px) 100vw, 768px" // max-w-3xl is roughly 768px
               />
             </div>
           )}
@@ -54,12 +67,16 @@ export default async function NewsPostPage({ params }: { params: Promise<{ slug:
             <section className="mt-12">
               <h2 className="text-3xl font-bold text-center mb-8">Gallery</h2>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                {post.photoGallery.map((photo: any, index: number) => (
-                  <div key={index} className="aspect-square relative">
-                    <img 
+                {/* CHANGE 4: Use the GalleryPhoto interface instead of 'any' */}
+                {post.photoGallery.map((photo: GalleryPhoto, index: number) => (
+                  <div key={photo._key || index} className="aspect-square relative">
+                    {/* CHANGE 5: Replace gallery <img> with <Image> */}
+                    <Image 
                       src={urlFor(photo).width(800).height(800).url()} 
                       alt={`Gallery photo ${index + 1}`}
-                      className="w-full h-full object-cover rounded-lg shadow-lg"
+                      fill
+                      className="object-cover rounded-lg shadow-lg"
+                      sizes="(max-width: 768px) 50vw, 33vw"
                     />
                   </div>
                 ))}
@@ -71,5 +88,3 @@ export default async function NewsPostPage({ params }: { params: Promise<{ slug:
     </div>
   );
 }
-
-
