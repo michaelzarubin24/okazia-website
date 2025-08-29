@@ -26,9 +26,10 @@ const ALBUM_QUERY = `*[_type == "musicRelease" && slug.current == $slug][0]{
   }
 }`;
 
-export default async function AlbumPage({ params }: { params: { slug:string } }) {
+export default async function AlbumPage({ params }: { params: Promise<{ slug:string }> }) {
   // Simplified params handling
-  const album = await client.fetch<SanityDocument>(ALBUM_QUERY, { slug: params.slug });
+  const resolvedParams = await params;
+  const album = await client.fetch<SanityDocument>(ALBUM_QUERY, { slug: resolvedParams.slug });
 
   if (!album) {
     return <div className="pt-24 text-center">Альбом не знайдено.</div>;

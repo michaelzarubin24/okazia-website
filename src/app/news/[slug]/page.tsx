@@ -25,9 +25,10 @@ const POST_QUERY = `*[_type == "post" && slug.current == $slug][0]{
   photoGallery
 }`;
 
-export default async function NewsPostPage({ params }: { params: { slug: string } }) {
+export default async function NewsPostPage({ params }: { params: Promise<{ slug: string }> }) {
   // Simplified params handling
-  const post = await client.fetch<SanityDocument>(POST_QUERY, { slug: params.slug });
+  const resolvedParams = await params;
+  const post = await client.fetch<SanityDocument>(POST_QUERY, { slug: resolvedParams.slug });
 
   if (!post) {
     return <div className="pt-24 text-center">Post not found.</div>;
