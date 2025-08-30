@@ -1,56 +1,67 @@
-// FILE: src/app/about/page.tsx
-// This page now dynamically displays all band members from Sanity and is mobile-friendly.
-
 import { type SanityDocument } from 'next-sanity';
 import { client } from '../../sanity/client';
 import Link from 'next/link';
+import Image from 'next/image';
+import { urlFor } from '@/sanity/image';
 
+// CORRECTED: Query now fetches the full image object for urlFor
 const MEMBERS_QUERY = `*[_type == "bandMember"]|order(order asc){
   _id,
   name,
   "slug": slug.current,
-  "imageUrl": image.asset->url
+  "image": image // Fetch the full image object, not just the URL
 }`;
 
 export default async function AboutPage() {
   const bandMembers = await client.fetch<SanityDocument[]>(MEMBERS_QUERY);
 
-  // The height of your header on desktop (4rem = 16 in Tailwind's spacing scale)
-  const headerHeightDesktop = '5rem';
-  // Each row on desktop should take up half the viewport height minus half the header height
-  const desktopRowHeight = `calc(100vh - (${headerHeightDesktop} / 2))`;
-
   return (
-    // On medium screens and up, we add padding-top to push the content below the header.
-    // On mobile, there is no padding, so the content goes under the header.
-    <div className="md:pt-[4rem] text-center">
-      {/* This is now a single grid container.
-        - On mobile (default): It's a single column (grid-cols-1).
-        - On medium screens and up (md): It becomes a two-column grid (md:grid-cols-2).
-      */}
-      {/* <h2 className="text-3xl sm:text-4xl font-bold mt-6 mb-12">КОМАНДА</h2> */}
-      <div className="grid grid-cols-1 md:grid-cols-2">
+    // Main page container
+    <div>
+      {/* ADDED: Title and Description Section */}
+      <section className="bg-black text-center py-16 md:py-24 px-4">
+        <div className="max-w-3xl mx-auto">
+          <h1 className="text-4xl md:text-5xl font-extrabold uppercase tracking-wider">
+            Команда
+          </h1>
+          <p className="text-lg text-gray-400 mt-4 leading-relaxed">
+            OKAZIA – це більше, ніж просто музика. Це синергія чотирьох
+            унікальних особистостей, кожна з яких привносить свою енергію та
+            бачення у нашу творчість. Познайомтеся з тими, хто стоїть за її
+            звуком.
+          </p>
+        </div>
+      </section>
+
+      {/* MODIFIED: Adjusted grid height for a better scrolling experience */}
+      <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 w-full">
         {bandMembers.map((member) => (
           <Link
             key={member._id}
             href={`/about/${member.slug}`}
-            // On mobile, each item is full screen height.
-            // On desktop, it uses the calculated height to fit perfectly.
-            className="group relative w-full h-screen md:h-auto overflow-hidden bg-black"
-            style={{ height: '100vh' }}
+            className="group relative h-[60vh] md:h-[80vh] w-full overflow-hidden"
           >
-            <div
-              style={{ backgroundImage: `url(${member.imageUrl})` }}
-              className="h-full w-full bg-cover bg-no-repeat bg-center transition-all duration-500 ease-in-out group-hover:scale-105"
+            {/* Optimized Next.js Image component for the background */}
+            <Image
+              // CORRECTED: Pass the full image object to urlFor
+              src={urlFor(member.image).width(1200).quality(95).url()}
+              alt={`Photo of ${member.name}`}
+              fill
+              className="object-cover object-center transition-transform duration-500 ease-in-out group-hover:scale-105"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 25vw, 100vw"
             />
-            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-500 ease-in-out flex items-center justify-center">
-              <h3 className="text-white text-3xl font-bold uppercase tracking-widest">
+            {/* Gradient overlay for text readability */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+
+            {/* Content container for the name */}
+            <div className="absolute inset-0 flex items-end justify-center p-8 transition-all duration-500 ease-in-out">
+              <h3 className="text-white text-3xl font-bold uppercase tracking-widest transform transition-transform duration-500 ease-in-out group-hover:scale-110 group-hover:-translate-y-4">
                 {member.name}
               </h3>
             </div>
           </Link>
         ))}
-      </div>
+      </section>
     </div>
   );
 }
