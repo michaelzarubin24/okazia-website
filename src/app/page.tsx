@@ -22,7 +22,7 @@ const FutureGigs = ({ gigs }: { gigs: SanityDocument[] }) => {
     return null;
   }
   return (
-    <section className="py-16 sm:py-24 bg-black">
+    <section className="py-9 sm:py-110 bg-black">
       <div className="container mx-auto px-4 text-center">
         <h2 className="text-3xl sm:text-4xl font-bold mb-12">АНОНСИ</h2>
         <div className="max-w-4xl mx-auto space-y-8">
@@ -228,14 +228,14 @@ export default function Home() {
 
       <FutureGigs gigs={futureGigs} />
 
-      <section className="py-16 sm:py-24 bg-black">
+      <section className="py-9 sm:py-12 bg-black">
         <div className="container mx-auto px-4 text-center">
             <h2 className="text-3xl sm:text-4xl font-bold mb-12">МУЗИКА</h2>
             <LatestReleasesCarousel releases={latestReleases} />
         </div>
       </section>
 
-      <section className="py-16 sm:py-24 bg-black">
+      <section className="py-9 sm:py-12 bg-black">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl sm:text-4xl font-bold mb-12">ВІДЕО</h2>
           <div className="relative h-[60vh] sm:h-[75vh] w-full overflow-hidden rounded-lg">
@@ -253,7 +253,7 @@ export default function Home() {
         </div>
       </section>
       
-      <section className="hidden md:block relative w-full h-[70vh]">
+      <section className="hidden md:block relative w-full h-[100vh]">
           <img src="/images/main-2.png" alt="Explore our tour" className="w-full h-full object-cover" />
           <div className="absolute inset-0 bg-black opacity-20"></div>
           <div className="absolute inset-0 flex flex-col items-center justify-center z-10 p-4 sm:p-8 text-center">
@@ -267,7 +267,7 @@ export default function Home() {
           </div>
       </section>
 
-      <section className="hidden md:block relative w-full h-[70vh]">
+      <section className="hidden md:block relative w-full h-[100vh]">
           <img src="/images/main-4.png" alt="Explore our concert" className="w-full h-full object-cover" />
           <div className="absolute inset-0 bg-black opacity-20"></div>
           <div className="absolute inset-0 flex items-end justify-center z-10 p-4 sm:p-8 md:p-12">
@@ -280,7 +280,7 @@ export default function Home() {
       </section>
 
 
-      <section className="py-16 sm:py-24 bg-black">
+      <section className="py-9 sm:py-12 bg-black">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl sm:text-4xl font-bold mb-12">НОВИНИ</h2>
           <LatestNewsCarousel posts={latestPosts} />

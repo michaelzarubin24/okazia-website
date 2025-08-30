@@ -1,5 +1,8 @@
 'use client'; // This enables interactivity for the dropdown menu.
 import "./globals.css";
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
 import { useState, useEffect } from 'react';
 import { Send, ChevronDown, ChevronUp, Menu, X } from 'lucide-react'; 
 import Link from 'next/link';
@@ -44,8 +47,8 @@ const Header = () => {
     {
       name: 'ПРО НАС',
       dropdown: [
-        { name: 'Команда', href: '/about' },
-        { name: 'Біографія', href: '/bio' },
+        { name: 'КОМАНДА', href: '/about' },
+        { name: 'БІОГРАФІЯ', href: '/bio' },
       ]
     },
     { name: 'МУЗИКА', href: '/music' },
@@ -55,8 +58,8 @@ const Header = () => {
     {
       name: 'КОНЦЕРТИ',
       dropdown: [
-        { name: 'Майбутні', href: '/gigs/future' },
-        { name: 'Архів', href: '/gigs/past' },
+        { name: 'МАЙБУТНІ', href: '/gigs/future' },
+        { name: 'АРХІВ', href: '/gigs/past' },
       ]
     },
     { name: 'КОНТАКТИ', href: '/contacts' },

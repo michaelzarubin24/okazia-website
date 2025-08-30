@@ -1,7 +1,7 @@
 // FILE: src/app/merch/page.tsx
 
-import { type SanityDocument } from "next-sanity";
-import { client } from '../../sanity/client'; 
+import { type SanityDocument } from 'next-sanity';
+import { client } from '../../sanity/client';
 // CHANGE 1: Removed unused 'urlFor' import
 import Link from 'next/link';
 import Image from 'next/image'; // CHANGE 2: Import the Next.js Image component
@@ -25,11 +25,11 @@ export default async function MerchPage() {
           <h1 className="text-4xl sm:text-6xl font-extrabold uppercase tracking-wider mb-4">
             МЕРЧ
           </h1>
-          <p className="text-lg text-gray-400 max-w-2xl mx-auto">
-            Підтримайте гурт і виглядайте добре, роблячи це! 
-          </p>
           {/* CHANGE 3: Replaced the apostrophe in "зв'яжіться" with "&apos;" */}
-          <p className="text-lg text-gray-400 max-w-2xl mx-auto mb-16">Щоб замовити будь-який з наших товарів, будь ласка, зв&apos;яжіться з нами через сторінку контактів!</p>
+          <p className="text-lg text-gray-400 max-w-2xl mx-auto mb-16">
+            Щоб замовити будь-який з наших товарів, будь ласка, зв&apos;яжіться
+            з нами через сторінку контактів!
+          </p>
         </div>
 
         {/* Merch Grid */}
@@ -39,8 +39,8 @@ export default async function MerchPage() {
               {/* CHANGE 4: Add 'relative' to the parent div */}
               <div className="relative aspect-square w-full bg-gray-800 rounded-lg overflow-hidden">
                 {/* CHANGE 5: Replace <img> with <Image> */}
-                <Image 
-                  src={product.imageUrl} 
+                <Image
+                  src={product.imageUrl}
                   alt={`Photo of ${product.name}`}
                   fill
                   className="object-cover group-hover:scale-105 transition-transform duration-300"
@@ -57,12 +57,12 @@ export default async function MerchPage() {
 
         {/* Call to Action */}
         <div className="mt-20 text-center">
-            <Link
-                href="/contacts"
-                className="inline-block bg-white text-black font-bold text-lg tracking-widest uppercase px-10 py-4 hover:bg-gray-200 transition-colors duration-300"
-            >
-                ЗАМОВИТИ
-            </Link>
+          <Link
+            href="/contacts"
+            className="inline-block bg-white text-black font-bold text-lg tracking-widest uppercase px-10 py-4 hover:bg-gray-200 transition-colors duration-300"
+          >
+            ЗАМОВИТИ
+          </Link>
         </div>
       </div>
     </div>
