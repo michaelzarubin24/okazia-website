@@ -18,7 +18,7 @@ export default async function MerchPage() {
   const products = await client.fetch<SanityDocument[]>(
     MERCH_QUERY,
     {},
-    { next: { revalidate: 3600 } }
+    { next: { revalidate: 300 } }
   );
   const headerHeight = '3.5rem';
 
@@ -32,7 +32,14 @@ export default async function MerchPage() {
           {/* CHANGE 3: Replaced the apostrophe in "зв'яжіться" with "&apos;" */}
           <p className="text-lg text-gray-400 max-w-2xl mx-auto mb-16">
             Щоб замовити будь-який з наших товарів, будь ласка, зв&apos;яжіться
-            з нами через сторінку контактів!
+            з нами через сторінку{' '}
+            <Link
+              href="/contacts"
+              className="underline hover:text-white transition-colors"
+            >
+              контактів
+            </Link>
+            !
           </p>
         </div>
 
