@@ -10,9 +10,9 @@ import { Metadata } from 'next';
 export async function generateMetadata({
   params,
 }: {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
-  const slug = params.slug;
+  const slug = (await params).slug;
 
   // Fetch the specific post data needed for metadata
   const post = await client.fetch<SanityDocument>(

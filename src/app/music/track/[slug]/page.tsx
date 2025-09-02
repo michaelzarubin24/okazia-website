@@ -10,9 +10,9 @@ import Image from 'next/image';
 export async function generateMetadata({
   params,
 }: {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
-  const slug = params.slug;
+  const slug = (await params).slug;
 
   // Fetch the specific track data needed for metadata
   const track = await client.fetch<SanityDocument>(
