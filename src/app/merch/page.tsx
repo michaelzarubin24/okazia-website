@@ -15,7 +15,11 @@ const MERCH_QUERY = `*[_type == "merchProduct"]{
 }`;
 
 export default async function MerchPage() {
-  const products = await client.fetch<SanityDocument[]>(MERCH_QUERY);
+  const products = await client.fetch<SanityDocument[]>(
+    MERCH_QUERY,
+    {},
+    { next: { revalidate: 3600 } }
+  );
   const headerHeight = '3.5rem';
 
   return (

@@ -42,10 +42,18 @@ export default async function GigDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const resolvedParams = await params;
-  const gig = await client.fetch<SanityDocument>(GIG_DETAIL_QUERY, {
-    slug: resolvedParams.slug,
-  });
-  const allGigs = await client.fetch<SanityDocument[]>(ALL_GIGS_QUERY);
+  const gig = await client.fetch<SanityDocument>(
+    GIG_DETAIL_QUERY,
+    {
+      slug: resolvedParams.slug,
+    },
+    { next: { revalidate: 60 } }
+  );
+  const allGigs = await client.fetch<SanityDocument[]>(
+    ALL_GIGS_QUERY,
+    {},
+    { next: { revalidate: 60 } }
+  );
 
   const relatedGigs = allGigs
     .filter((g) => g.slug !== resolvedParams.slug)

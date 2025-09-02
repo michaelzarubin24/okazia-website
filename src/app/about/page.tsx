@@ -13,7 +13,11 @@ const MEMBERS_QUERY = `*[_type == "bandMember"]|order(order asc){
 }`;
 
 export default async function AboutPage() {
-  const bandMembers = await client.fetch<SanityDocument[]>(MEMBERS_QUERY);
+  const bandMembers = await client.fetch<SanityDocument[]>(
+    MEMBERS_QUERY,
+    {},
+    { next: { revalidate: 3600 } }
+  );
 
   return (
     // Main page container

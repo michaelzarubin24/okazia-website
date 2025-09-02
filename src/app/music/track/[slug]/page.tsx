@@ -76,9 +76,13 @@ export default async function TrackPage({
   params: Promise<{ slug: string }>;
 }) {
   const resolvedParams = await params;
-  const track = await client.fetch<SanityDocument>(TRACK_QUERY, {
-    slug: resolvedParams.slug,
-  });
+  const track = await client.fetch<SanityDocument>(
+    TRACK_QUERY,
+    {
+      slug: resolvedParams.slug,
+    },
+    { next: { revalidate: 60 } }
+  );
 
   if (!track || !track.release) {
     return <div className="pt-24 text-center">Трек не знайдено.</div>;

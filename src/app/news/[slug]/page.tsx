@@ -78,9 +78,13 @@ export default async function NewsPostPage({
   params: Promise<{ slug: string }>;
 }) {
   const resolvedParams = await params;
-  const post = await client.fetch<SanityDocument>(POST_QUERY, {
-    slug: resolvedParams.slug,
-  });
+  const post = await client.fetch<SanityDocument>(
+    POST_QUERY,
+    {
+      slug: resolvedParams.slug,
+    },
+    { next: { revalidate: 60 } }
+  );
 
   if (!post) {
     return <div className="pt-24 text-center">Post not found.</div>;

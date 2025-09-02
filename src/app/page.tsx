@@ -52,10 +52,26 @@ const LATEST_POSTS_QUERY = `*[_type == "post"]|order(publishedAt desc)[0...3]{
 export default async function Home() {
   // Fetch all data on the server in parallel for maximum speed
   const [releases, gigs, videos, posts] = await Promise.all([
-    client.fetch<SanityDocument[]>(LATEST_RELEASES_QUERY),
-    client.fetch<SanityDocument[]>(FUTURE_GIGS_QUERY),
-    client.fetch<SanityDocument[]>(VIDEOS_QUERY),
-    client.fetch<SanityDocument[]>(LATEST_POSTS_QUERY),
+    client.fetch<SanityDocument[]>(
+      LATEST_RELEASES_QUERY,
+      {},
+      { next: { revalidate: 60 } }
+    ),
+    client.fetch<SanityDocument[]>(
+      FUTURE_GIGS_QUERY,
+      {},
+      { next: { revalidate: 60 } }
+    ),
+    client.fetch<SanityDocument[]>(
+      VIDEOS_QUERY,
+      {},
+      { next: { revalidate: 60 } }
+    ),
+    client.fetch<SanityDocument[]>(
+      LATEST_POSTS_QUERY,
+      {},
+      { next: { revalidate: 60 } }
+    ),
   ]);
 
   // Render the Client Component and pass the fetched data down as props

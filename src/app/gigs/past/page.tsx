@@ -13,7 +13,11 @@ const PAST_GIGS_QUERY = `*[_type == "gig" && date < now()]|order(date desc){
 }`;
 
 export default async function PastGigsPage() {
-  const pastGigs = await client.fetch<SanityDocument[]>(PAST_GIGS_QUERY);
+  const pastGigs = await client.fetch<SanityDocument[]>(
+    PAST_GIGS_QUERY,
+    {},
+    { next: { revalidate: 60 } }
+  );
 
   const headerHeight = '3.5rem';
 

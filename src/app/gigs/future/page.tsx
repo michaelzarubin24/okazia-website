@@ -1,7 +1,7 @@
 // FILE: src/app/gigs/future/page.tsx
 
-import { type SanityDocument } from "next-sanity";
-import { client } from '../../../sanity/client'; 
+import { type SanityDocument } from 'next-sanity';
+import { client } from '../../../sanity/client';
 import Link from 'next/link';
 
 const FUTURE_GIGS_QUERY = `*[_type == "gig" && date >= now()]|order(date asc){
@@ -15,7 +15,11 @@ const FUTURE_GIGS_QUERY = `*[_type == "gig" && date >= now()]|order(date asc){
 }`;
 
 export default async function FutureGigsPage() {
-  const futureGigs = await client.fetch<SanityDocument[]>(FUTURE_GIGS_QUERY);
+  const futureGigs = await client.fetch<SanityDocument[]>(
+    FUTURE_GIGS_QUERY,
+    {},
+    { next: { revalidate: 60 } }
+  );
 
   const headerHeight = '3.5rem';
 
@@ -29,12 +33,23 @@ export default async function FutureGigsPage() {
         {futureGigs.length > 0 ? (
           <div className="max-w-4xl mx-auto space-y-4">
             {futureGigs.map((gig) => (
-              <div key={gig._id} className="flex flex-col sm:flex-row items-center justify-between p-6 bg-gray-800/50 rounded-lg">
+              <div
+                key={gig._id}
+                className="flex flex-col sm:flex-row items-center justify-between p-6 bg-gray-800/50 rounded-lg"
+              >
                 <div className="text-center sm:text-left mb-4 sm:mb-0">
-                  <p className="text-xl font-bold">{new Date(gig.date).toLocaleDateString('uk-UA', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
-                  <p className="text-gray-400">{gig.venue}, {gig.city}</p>
+                  <p className="text-xl font-bold">
+                    {new Date(gig.date).toLocaleDateString('uk-UA', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                    })}
+                  </p>
+                  <p className="text-gray-400">
+                    {gig.venue}, {gig.city}
+                  </p>
                 </div>
-                
+
                 {gig.ticketsUrl ? (
                   <Link
                     href={gig.ticketsUrl}

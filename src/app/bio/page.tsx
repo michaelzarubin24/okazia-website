@@ -3,8 +3,8 @@
 
 // src/app/bio/page.tsx
 
-import { type SanityDocument } from "next-sanity";
-import { PortableText } from "@portabletext/react";
+import { type SanityDocument } from 'next-sanity';
+import { PortableText } from '@portabletext/react';
 import { client } from '../../sanity/client';
 import { urlFor } from '../../sanity/image';
 import Image from 'next/image'; // CHANGE 1: Import the Next.js Image component
@@ -28,10 +28,18 @@ const BIO_QUERY = `*[_type == "bio"][0]{
 
 export default async function BioPage() {
   // Use a more specific type for the fetched data if you have one, but SanityDocument is a good default
-  const bio = await client.fetch<SanityDocument>(BIO_QUERY);
+  const bio = await client.fetch<SanityDocument>(
+    BIO_QUERY,
+    {},
+    { next: { revalidate: 3600 } }
+  );
 
   if (!bio) {
-    return <div className="pt-24 text-center">Біографія не знайдена. Будь ласка, додайте її в Sanity Studio.</div>;
+    return (
+      <div className="pt-24 text-center">
+        Біографія не знайдена. Будь ласка, додайте її в Sanity Studio.
+      </div>
+    );
   }
 
   const headerHeight = '4.2rem';
@@ -39,7 +47,7 @@ export default async function BioPage() {
   return (
     <div style={{ paddingTop: headerHeight }}>
       {/* Hero Image Section */}
-      <section 
+      <section
         className="relative h-[50vh] w-full flex items-center justify-center text-center bg-cover bg-center"
         style={{ backgroundImage: `url(${bio.mainImageUrl})` }}
       >
@@ -66,10 +74,13 @@ export default async function BioPage() {
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 {/* CHANGE 3: Use the GalleryPhoto interface instead of 'any' */}
                 {bio.photoGallery.map((photo: GalleryPhoto, index: number) => (
-                  <div key={photo._key || index} className="aspect-square relative">
+                  <div
+                    key={photo._key || index}
+                    className="aspect-square relative"
+                  >
                     {/* CHANGE 4: Replace <img> with next/image's <Image> component */}
-                    <Image 
-                      src={urlFor(photo).width(800).height(800).url()} 
+                    <Image
+                      src={urlFor(photo).width(800).height(800).url()}
                       alt={`Gallery photo ${index + 1}`}
                       fill // Makes the image fill the parent div
                       className="w-full h-full object-cover rounded-lg shadow-lg"
