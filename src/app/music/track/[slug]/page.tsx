@@ -1,23 +1,23 @@
 import { type SanityDocument } from 'next-sanity';
 import { PortableText } from '@portabletext/react';
 import { client } from '../../../../sanity/client';
-import { Metadata } from 'next';
 import { Play } from 'lucide-react';
 import Link from 'next/link';
-import Image from 'next/image'; // Make sure Image is imported
+import { Metadata } from 'next';
+import Image from 'next/image';
 
-type Props = {
+// --- This function generates the dynamic metadata for each track ---
+export async function generateMetadata({
+  params,
+}: {
   params: { slug: string };
-};
-
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+}): Promise<Metadata> {
   const slug = params.slug;
 
-  // UPDATED QUERY: Now fetches the track's artwork from its related release
+  // Fetch the specific track data needed for metadata
   const track = await client.fetch<SanityDocument>(
     `*[_type == "track" && slug.current == $slug][0]{
       title,
-      "artistName": "OKAZIA",
       "release": *[_type == "musicRelease" && references(^._id)][0]{
         "artworkUrl": artwork.asset->url
       }
@@ -28,14 +28,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!track) {
     return {
       title: 'Track Not Found',
-      description: 'This track could not be found.',
     };
   }
 
-  const pageTitle = `${track.title} - ${track.artistName}`;
-  const pageDescription = `"${track.title}" - ${track.artistName}. Дізнайся більше про цей реліз!`;
-
-  // Conditionally set the artwork URL, or fall back to the site's default image
+  const pageTitle = `${track.title} - OKAZIA | Офіційна сторінка`;
+  const pageDescription = `Слухай "${track.title}" від OKAZIA. Досліджуй тексти, інформацію про реліз та відкривай більше музики від українського інді-рок гурту з Харкова!`;
   const imageUrl =
     track.release?.artworkUrl ||
     'https://www.okazia.com.ua/images/photo-all-2.png';
@@ -47,22 +44,24 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       title: pageTitle,
       description: pageDescription,
       url: `https://www.okazia.com.ua/music/track/${slug}`,
-      images: [{ url: imageUrl }], // ADDED: Use the specific track's artwork
+      images: [{ url: imageUrl }],
     },
     twitter: {
       title: pageTitle,
       description: pageDescription,
-      images: [imageUrl], // ADDED: Use the specific track's artwork
+      images: [imageUrl],
     },
   };
 }
 
+// This query finds the specific track by its slug, and also finds the release it belongs to.
 const TRACK_QUERY = `*[_type == "track" && slug.current == $slug][0]{
   _id,
   title,
   aboutSong,
   aboutInstrumental,
   lyrics,
+  // Find the release that references this track
   "release": *[_type == "musicRelease" && references(^._id)][0]{
     title,
     releaseDate,
@@ -71,10 +70,14 @@ const TRACK_QUERY = `*[_type == "track" && slug.current == $slug][0]{
   }
 }`;
 
-// CORRECTED: The params prop now uses the correct, modern format
-export default async function TrackPage({ params }: Props) {
+export default async function TrackPage({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const resolvedParams = await params;
   const track = await client.fetch<SanityDocument>(TRACK_QUERY, {
-    slug: params.slug,
+    slug: resolvedParams.slug,
   });
 
   if (!track || !track.release) {
@@ -89,7 +92,6 @@ export default async function TrackPage({ params }: Props) {
         <section className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-start">
           {/* Left Column: Artwork and Link */}
           <div>
-            {/* CORRECTED: Replaced <img> with the optimized <Image> component */}
             <div className="relative w-full aspect-square">
               <Image
                 src={track.release.artworkUrl}
