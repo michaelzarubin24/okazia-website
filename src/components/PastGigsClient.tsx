@@ -69,18 +69,21 @@ export default function PastGigsClient({
         </h1>
 
         {/* Filter and Sort Controls */}
-        <div className="max-w-4xl mx-auto mb-8 flex flex-col sm:flex-row gap-4 justify-between items-center p-4 bg-gray-900/50 rounded-lg">
-          <div className="flex items-center gap-4">
-            <label htmlFor="year-select" className="font-semibold">
+        <div className="max-w-4xl mx-auto mb-8 flex flex-row justify-between items-center gap-4 p-4 bg-gray-900/50 rounded-lg">
+          <div className="flex items-center gap-2">
+            <label
+              htmlFor="year-select"
+              className="font-semibold text-sm sm:text-base"
+            >
               Рік:
             </label>
             <select
               id="year-select"
               value={selectedYear}
               onChange={handleYearChange}
-              className="bg-gray-800 border border-gray-700 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-white"
+              className="bg-gray-800 border border-gray-700 rounded-md px-2 sm:px-3 py-2 text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-white"
             >
-              <option value="all">Всі роки</option>
+              <option value="all">Всі</option>
               {allYears.map((year) => (
                 <option key={year} value={year}>
                   {year}
@@ -90,10 +93,10 @@ export default function PastGigsClient({
           </div>
           <button
             onClick={toggleSortOrder}
-            className="flex items-center gap-2 px-4 py-2 bg-gray-800 border border-gray-700 rounded-md hover:bg-gray-700 transition-colors"
+            className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-gray-800 border border-gray-700 rounded-md hover:bg-gray-700 transition-colors text-sm sm:text-base"
           >
             <ArrowUpDown size={16} />
-            <span>
+            <span className="hidden sm:inline">
               {sortOrder === 'desc' ? 'Спочатку новіші' : 'Спочатку старіші'}
             </span>
           </button>
