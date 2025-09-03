@@ -1,58 +1,42 @@
 import { type SanityDocument } from 'next-sanity';
 import { client } from '../../../sanity/client';
-import Link from 'next/link';
+import PastGigsClient from '@/components/PastGigsClient'; // We will create this component
+import { Metadata } from 'next';
 
-// This query fetches all gigs with a date before right now,
-// and sorts them in descending order (most recent first).
-const PAST_GIGS_QUERY = `*[_type == "gig" && date < now()]|order(date desc){
+// SEO Metadata for the page
+export const metadata: Metadata = {
+  title: 'Архів Концертів | OKAZIA',
+  description:
+    'Перегляньте архів минулих концертів гурту OKAZIA. Знайдіть сетлисти, фотографії та спогади з наших минулих виступів.',
+};
+
+// This query fetches all the necessary data for every past gig
+const ALL_PAST_GIGS_QUERY = `*[_type == "gig" && date < now()]|order(date desc){
   _id,
   date,
   venue,
   city,
-  "slug": slug.current
+  "slug": slug.current,
+  "posterImage": posterImageUrl.asset->{
+    url,
+    metadata {
+      dimensions
+    }
+  }
 }`;
 
 export default async function PastGigsPage() {
-  const pastGigs = await client.fetch<SanityDocument[]>(
-    PAST_GIGS_QUERY,
+  const allPastGigs = await client.fetch<SanityDocument[]>(
+    ALL_PAST_GIGS_QUERY,
     {},
-    { next: { revalidate: 60 } }
+    // Revalidate the data at most once an hour
+    { next: { revalidate: 3600 } }
   );
 
-  const headerHeight = '3.5rem';
+  // Calculate all unique years from the gigs to populate the filter dropdown
+  const allYears = [
+    ...new Set(allPastGigs.map((gig) => new Date(gig.date).getFullYear())),
+  ].sort((a, b) => b - a); // Sort years descending
 
-  return (
-    <div style={{ paddingTop: headerHeight }}>
-      <div className="container mx-auto px-4 py-12 md:py-20">
-        <h1 className="text-4xl sm:text-6xl font-extrabold text-center uppercase tracking-wider mb-16">
-          АРХІВ
-        </h1>
-
-        <div className="max-w-4xl mx-auto border-t border-gray-700">
-          {pastGigs.map((gig) => (
-            <Link
-              key={gig._id}
-              href={`/gigs/archive/${gig.slug}`}
-              className="flex justify-between items-center p-6 border-b border-gray-700 hover:bg-gray-800/50 transition-colors"
-            >
-              <div>
-                {/* UPDATED: Changed 'en-US' to 'uk-UA' for Ukrainian date format */}
-                <p className="text-xl font-bold">
-                  {new Date(gig.date).toLocaleDateString('uk-UA', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                  })}
-                </p>
-                <p className="text-gray-400">
-                  {gig.venue}, {gig.city}
-                </p>
-              </div>
-              <span className="text-gray-400 hidden sm:inline">→</span>
-            </Link>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
+  return <PastGigsClient initialGigs={allPastGigs} allYears={allYears} />;
 }

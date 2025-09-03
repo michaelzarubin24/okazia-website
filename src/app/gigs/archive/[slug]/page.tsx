@@ -5,6 +5,46 @@ import { client } from '../../../../sanity/client';
 import { urlFor } from '../../../../sanity/image';
 import Link from 'next/link';
 import Image from 'next/image';
+import { Metadata } from 'next';
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const slug = (await params).slug;
+  const gig = await client.fetch<SanityDocument>(
+    `*[_type == "gig" && slug.current == $slug][0]{
+      title,
+      "posterImageUrl": posterImageUrl.asset->url
+    }`,
+    { slug }
+  );
+
+  if (!gig) {
+    return { title: 'Концерт не знайдено' };
+  }
+
+  const pageTitle = `${gig.title} | Архів Концертів | OKAZIA`;
+  const pageDescription = `Деталі концерту ${gig.title} від OKAZIA. Перегляньте сетлист, фото та цікаві факти з виступу.`;
+  const imageUrl =
+    gig.posterImageUrl || 'https://www.okazia.com.ua/images/photo-all-2.png';
+
+  return {
+    title: pageTitle,
+    description: pageDescription,
+    openGraph: {
+      title: pageTitle,
+      description: pageDescription,
+      images: [{ url: imageUrl }],
+    },
+    twitter: {
+      title: pageTitle,
+      description: pageDescription,
+      images: [imageUrl],
+    },
+  };
+}
 
 interface GalleryPhoto {
   _key: string;
@@ -33,7 +73,8 @@ const ALL_GIGS_QUERY = `*[_type == "gig" && defined(slug.current)]|order(date de
   _id,
   title,
   date,
-  "slug": slug.current
+  "slug": slug.current,
+  "posterImageUrl": posterImageUrl.asset->url
 }`;
 
 export default async function GigDetailPage({
@@ -47,17 +88,22 @@ export default async function GigDetailPage({
     {
       slug: resolvedParams.slug,
     },
-    { next: { revalidate: 60 } }
+    { next: { revalidate: 3600 } }
   );
   const allGigs = await client.fetch<SanityDocument[]>(
     ALL_GIGS_QUERY,
     {},
-    { next: { revalidate: 60 } }
+    { next: { revalidate: 3600 } }
   );
 
-  const relatedGigs = allGigs
-    .filter((g) => g.slug !== resolvedParams.slug)
-    .slice(0, 3);
+  // Shuffle the related gigs for a random selection
+  const otherGigs = allGigs.filter((g) => g._id !== gig._id);
+  // Fisher-Yates shuffle algorithm
+  for (let i = otherGigs.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [otherGigs[i], otherGigs[j]] = [otherGigs[j], otherGigs[i]];
+  }
+  const relatedGigs = otherGigs.slice(0, 4);
 
   if (!gig) {
     return <div className="pt-24 text-center">Концерт не знайдено.</div>;
@@ -110,13 +156,13 @@ export default async function GigDetailPage({
             {gig.posterImageUrl && (
               <div>
                 <h3 className="text-2xl font-bold mb-4">Постер</h3>
-                <div className="relative w-full max-w-xs mx-auto bg-gray-800/50 rounded-lg">
+                <div className="relative w-full max-w-xs mx-auto">
                   <Image
                     src={gig.posterImageUrl}
                     alt={`Poster for ${gig.title}`}
-                    width={400} // choose the pixel width you want
-                    height={600} // match the poster's natural ratio
-                    className="rounded-lg shadow-2xl"
+                    width={400}
+                    height={600}
+                    className="w-full h-auto rounded-lg shadow-2xl"
                   />
                 </div>
               </div>
@@ -131,14 +177,14 @@ export default async function GigDetailPage({
               {gig.photoGallery.map((photo: GalleryPhoto, index: number) => (
                 <div
                   key={photo._key || index}
-                  className="relative w-full"
-                  style={{ paddingTop: '75%' }}
+                  className="relative aspect-video rounded-lg overflow-hidden shadow-lg"
                 >
+                  {/* CORRECTED: Pass the entire 'photo' object to urlFor */}
                   <Image
-                    src={urlFor(photo.asset).width(800).height(600).url()!}
+                    src={urlFor(photo).width(800).height(600).url()!}
                     alt={`Gig photo ${index + 1}`}
                     fill
-                    className="object-cover rounded-lg shadow-lg"
+                    className="object-cover"
                     sizes="(max-width: 768px) 50vw, 25vw"
                   />
                 </div>
@@ -166,21 +212,35 @@ export default async function GigDetailPage({
           <h2 className="text-3xl font-bold text-center mb-8">
             Більше концертів
           </h2>
-          <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
             {relatedGigs.map((relatedGig: SanityDocument) => (
               <Link
                 key={relatedGig.slug}
                 href={`/gigs/archive/${relatedGig.slug}`}
-                className="block p-4 bg-gray-800/50 rounded-lg hover:bg-gray-700/50 transition-colors text-center"
+                className="group relative aspect-[2/3] w-full bg-gray-900 rounded-lg overflow-hidden p-2"
               >
-                <p className="font-bold">{relatedGig.title}</p>
-                <p className="text-sm text-gray-400">
-                  {new Date(relatedGig.date).toLocaleDateString('uk-UA', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                  })}
-                </p>
+                {relatedGig.posterImageUrl ? (
+                  <Image
+                    src={relatedGig.posterImageUrl}
+                    alt={`Poster for ${relatedGig.title}`}
+                    fill
+                    className="object-contain group-hover:scale-105 transition-transform duration-300"
+                    sizes="(max-width: 768px) 50vw, 25vw"
+                  />
+                ) : (
+                  <div className="flex items-center justify-center h-full text-gray-500">
+                    No Poster
+                  </div>
+                )}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
+                <div className="absolute bottom-0 left-0 p-3 text-white">
+                  <h4 className="font-bold text-sm leading-tight">
+                    {relatedGig.title}
+                  </h4>
+                  <p className="text-xs text-gray-300 mt-1">
+                    {new Date(relatedGig.date).getFullYear()}
+                  </p>
+                </div>
               </Link>
             ))}
           </div>
