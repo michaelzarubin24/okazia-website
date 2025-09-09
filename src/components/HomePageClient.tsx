@@ -101,9 +101,21 @@ const LatestReleasesCarousel = ({
   releases: SanityDocument[];
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [slidesToShow, setSlidesToShow] = useState(4); // Always show 4 slides
+  const [slidesToShow, setSlidesToShow] = useState(4);
 
-  // Removed the useEffect that changed slides based on screen width
+  useEffect(() => {
+    const handleResize = () => {
+      // UPDATED LOGIC: Show 2 slides below 640px, and 4 slides above
+      if (window.innerWidth < 640) {
+        setSlidesToShow(2);
+      } else {
+        setSlidesToShow(4);
+      }
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const handlePrev = () => setCurrentIndex((prev) => (prev > 0 ? prev - 1 : 0));
   const handleNext = () => {
@@ -156,7 +168,7 @@ const LatestReleasesCarousel = ({
                       alt={release.title}
                       fill
                       className="object-cover"
-                      sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 25vw"
+                      sizes="(max-width: 640px) 50vw, 25vw"
                     />
                     <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center p-4">
                       <h3 className="text-white font-bold text-center text-lg sm:text-xl">
