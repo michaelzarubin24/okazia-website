@@ -16,6 +16,17 @@ const getYouTubeThumbnail = (url: string) => {
   return '';
 };
 
+// --- NEW: SECTION TITLE HELPER COMPONENT ---
+const SectionTitle = ({ title }: { title: string }) => (
+  <div className="flex items-center w-full max-w-4xl mx-auto gap-4 sm:gap-6 mb-12">
+    <div className="h-px flex-grow bg-gray-700/50" />
+    <h2 className="text-3xl sm:text-4xl font-bold uppercase tracking-wider flex-shrink-0">
+      {title}
+    </h2>
+    <div className="h-px flex-grow bg-gray-700/50" />
+  </div>
+);
+
 // --- FUTURE GIGS SUB-COMPONENT ---
 const FutureGigs = ({ gigs }: { gigs: SanityDocument[] }) => {
   if (!gigs || gigs.length === 0) {
@@ -23,8 +34,8 @@ const FutureGigs = ({ gigs }: { gigs: SanityDocument[] }) => {
   }
   return (
     <section className="py-9 sm:py-12 bg-black">
-      <div className="container mx-auto px-4 text-center">
-        <h2 className="text-3xl sm:text-4xl font-bold mb-6">АНОНСИ</h2>
+      <div className="container mx-auto px-4">
+        <SectionTitle title="АНОНСИ" />
         <div className="max-w-4xl mx-auto space-y-8">
           {gigs.map((gig) => (
             <div
@@ -330,7 +341,6 @@ export default function HomePageClient({
 }: HomePageClientProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  // This hook is for client-side interactions only (the video player)
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
@@ -382,10 +392,9 @@ export default function HomePageClient({
           <p className="text-xl sm:text-2xl md:text-3xl uppercase tracking-[0.1em] sm:tracking-[0.18em] mt-4">
             Музична Оказія з Харкова
           </p>
-          {/* UPDATED: Button moved back inside the centered content div */}
           <div className="mt-8">
             <Link
-              href="https://send.monobank.ua/jar/2e2gMPFwPQ" // IMPORTANT: Replace '#' with your actual support link
+              href="https://send.monobank.ua/jar/x4X3UtTa6" // IMPORTANT: Replace '#' with your actual support link
               target="_blank"
               rel="noopener noreferrer"
               className="inline-block bg-transparent border-2 border-white text-white font-bold text-lg tracking-widest uppercase px-10 py-4 hover:bg-white hover:text-black transition-colors duration-300"
@@ -396,19 +405,18 @@ export default function HomePageClient({
         </div>
       </section>
 
-      {/* Render Sub-Components with data passed via props */}
       <FutureGigs gigs={initialGigs} />
 
       <section className="py-9 sm:py-12 bg-black">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl sm:text-4xl font-bold mb-12">МУЗИКА</h2>
+        <div className="container mx-auto px-4">
+          <SectionTitle title="МУЗИКА" />
           <LatestReleasesCarousel releases={initialReleases} />
         </div>
       </section>
 
       <section className="py-9 sm:py-12 bg-black">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl sm:text-4xl font-bold mb-12">ВІДЕО</h2>
+        <div className="container mx-auto px-4">
+          <SectionTitle title="ВІДЕО" />
           <div className="relative h-[60vh] sm:h-[75vh] w-full overflow-hidden rounded-lg">
             <video
               ref={videoRef}
@@ -506,10 +514,10 @@ export default function HomePageClient({
       </section>
 
       <section className="py-9 sm:py-12 bg-black">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl sm:text-4xl font-bold mb-12">НОВИНИ</h2>
+        <div className="container mx-auto px-4">
+          <SectionTitle title="НОВИНИ" />
           <LatestNewsCarousel posts={initialPosts} />
-          <div className="mt-12">
+          <div className="mt-12 text-center">
             <Link
               href="/news"
               className="inline-block bg-transparent border-2 border-white text-white font-bold text-lg tracking-widest uppercase px-10 py-4 hover:bg-white hover:text-black transition-colors duration-300"
