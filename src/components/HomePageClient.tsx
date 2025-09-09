@@ -358,7 +358,7 @@ export default function HomePageClient({
       `}</style>
 
       {/* Hero Section */}
-      <section className="relative w-full pt-12 pb-12 flex items-start justify-center bg-black md:h-screen md:items-center">
+      <section className="relative w-full pt-12 flex items-center justify-center bg-black md:h-screen">
         <Image
           src="/images/photo-all-2.png"
           alt="OKAZIA band photo"
@@ -367,7 +367,9 @@ export default function HomePageClient({
           className="hidden md:block object-cover"
         />
         <div className="absolute inset-0 bg-black opacity-50 md:hidden"></div>
-        <div className="absolute inset-0 bg-black opacity-30 hidden md:block"></div>
+        <div className="absolute inset-0 bg-black opacity-60 hidden md:block"></div>
+
+        {/* This div is for the centered content (logo and text) */}
         <div className="relative z-10 p-4 sm:p-8 flex flex-col items-center text-center text-white">
           <Image
             src="/okazia-white.png"
@@ -380,6 +382,17 @@ export default function HomePageClient({
           <p className="text-xl sm:text-2xl md:text-3xl uppercase tracking-[0.1em] sm:tracking-[0.18em] mt-4">
             Музична Оказія з Харкова
           </p>
+          {/* UPDATED: Button moved back inside the centered content div */}
+          <div className="mt-8">
+            <Link
+              href="https://send.monobank.ua/jar/2e2gMPFwPQ" // IMPORTANT: Replace '#' with your actual support link
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block bg-transparent border-2 border-white text-white font-bold text-lg tracking-widest uppercase px-10 py-4 hover:bg-white hover:text-black transition-colors duration-300"
+            >
+              ПІДТРИМАТИ
+            </Link>
+          </div>
         </div>
       </section>
 
