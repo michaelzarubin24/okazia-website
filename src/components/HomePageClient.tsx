@@ -101,18 +101,9 @@ const LatestReleasesCarousel = ({
   releases: SanityDocument[];
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [slidesToShow, setSlidesToShow] = useState(4);
+  const [slidesToShow, setSlidesToShow] = useState(4); // Always show 4 slides
 
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth < 640) setSlidesToShow(1);
-      else if (window.innerWidth < 768) setSlidesToShow(2);
-      else setSlidesToShow(4);
-    };
-    handleResize();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  // Removed the useEffect that changed slides based on screen width
 
   const handlePrev = () => setCurrentIndex((prev) => (prev > 0 ? prev - 1 : 0));
   const handleNext = () => {
