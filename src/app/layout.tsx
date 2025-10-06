@@ -43,7 +43,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'OKAZIA - Офіційний сайт',
     description: 'Офіційний сайт українського інді-рок гурту з Харкова.',
-    images: ['https://www.okazia.com.ua/og-image.png'], // URL to your social sharing image
+    images: ['https://www.okazia.com.ua/images/photo-all-2.png'], // URL to your social sharing image
   },
 };
 
