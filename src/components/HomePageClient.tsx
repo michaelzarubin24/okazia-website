@@ -397,7 +397,7 @@ export default function HomePageClient({
           </p>
           <div className="mt-8">
             <Link
-              href="https://send.monobank.ua/jar/x4X3UtTa6" // IMPORTANT: Replace '#' with your actual support link
+              href="https://send.monobank.ua/jar/2e2gMPFwPQ" // IMPORTANT: Replace '#' with your actual support link
               target="_blank"
               rel="noopener noreferrer"
               className="inline-block bg-transparent border-2 border-white text-white font-bold text-lg tracking-widest uppercase px-10 py-4 hover:bg-white hover:text-black transition-colors duration-300"
