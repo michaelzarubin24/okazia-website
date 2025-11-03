@@ -54,7 +54,13 @@ export const Header = () => {
       ],
     },
     { name: 'МУЗИКА', href: '/music' },
-    { name: 'ВІДЕО', href: '/videos' },
+    {
+      name: 'МЕДІА',
+      dropdown: [
+        { name: 'ФОТО', href: '/photos' }, // Новий лінк для фотогалереї
+        { name: 'ВІДЕО', href: '/videos' }, // Існуючий лінк, тепер вкладений
+      ],
+    },
     { name: 'НОВИНИ', href: '/news' },
     { name: 'МЕРЧ', href: '/merch' },
     {
