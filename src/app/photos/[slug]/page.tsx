@@ -5,16 +5,18 @@ import Image from 'next/image';
 import { client } from '@/sanity/client';
 import { urlFor } from '@/sanity/image';
 import { groq } from 'next-sanity';
-import { PortableText } from '@portabletext/react';
+import { PortableText, PortableTextBlock } from '@portabletext/react';
 import { X } from 'lucide-react';
+
+import type { ImageAsset } from 'sanity';
 
 // Повний інтерфейс для однієї фотогалереї
 interface PhotoGallery {
   _id: string;
   title: string;
   date: string;
-  description: any[]; // Portable Text
-  galleryImages: any[];
+  description: PortableTextBlock[]; // Portable Text
+  galleryImages: ImageAsset[];
 }
 
 // Запит GROQ для отримання однієї галереї за її slug

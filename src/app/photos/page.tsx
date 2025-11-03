@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { client } from '@/sanity/client';
 import { urlFor } from '@/sanity/image';
 import { groq } from 'next-sanity';
+import type { ImageAsset } from 'sanity';
 
 // Інтерфейс для даних, які ми запитуємо для картки галереї
 interface GalleryCard {
@@ -10,7 +11,7 @@ interface GalleryCard {
   title: string;
   slug: { current: string };
   date: string;
-  coverImage: any;
+  coverImage: ImageAsset[];
 }
 
 // Запит GROQ для отримання всіх галерей, відсортованих за датою
