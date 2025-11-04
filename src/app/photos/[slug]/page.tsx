@@ -2,38 +2,36 @@ import { client } from '@/sanity/client';
 import { urlFor } from '@/sanity/image';
 import { groq } from 'next-sanity';
 import { Metadata } from 'next';
-import { notFound } from 'next/navigation'; // Import notFound
-
-// Import the new client component and its types
-import PhotoGalleryClient, { type PhotoGallery } from './PhotoGalleryClient';
+import { notFound } from 'next/navigation';
+import PhotoGalleryClient, { type PhotoGallery } from './PhotoGalleryClient'; // This is the new client file
 import type { ImageAsset } from 'sanity';
 
-// This query is for metadata: gets title, text excerpt, and first image
+// Query for metadata (fast)
 const METADATA_QUERY = groq`*[_type == "photoGallery" && slug.current == $slug][0]{
   title,
-  "excerpt": pt::text(description[0...1]), // Get plain text from the first block
+  "excerpt": pt::text(description[0...1]),
   "coverImage": galleryImages[0].asset
 }`;
 
-// This is the full query for the page content
+// Query for page content (full)
 const PAGE_QUERY = groq`*[_type == "photoGallery" && slug.current == $slug][0] {
   _id,
   title,
   date,
   description,
   galleryImages[] {
-    _key, // Added _key for React keys
+    _key,
     asset
   }
 }`;
 
-// --- PRINCIPLE 1: Add generateMetadata (just like the news page) ---
+// --- generateMetadata function (using your Promise pattern) ---
 export async function generateMetadata({
   params,
 }: {
-  params: { slug: string };
+  params: Promise<{ slug: string }>; // Using your news page's pattern
 }): Promise<Metadata> {
-  const slug = params.slug;
+  const slug = (await params).slug; // Using your news page's pattern
 
   const gallery = await client.fetch<{
     title: string;
@@ -52,7 +50,7 @@ export async function generateMetadata({
 
   const imageUrl = gallery.coverImage
     ? urlFor(gallery.coverImage).width(1200).height(630).url()
-    : 'https://www.okazia.com.ua/images/photo-all-2.png'; // Fallback
+    : 'https://www.okazia.com.ua/images/photo-all-2.png';
 
   return {
     title: pageTitle,
@@ -71,25 +69,24 @@ export async function generateMetadata({
   };
 }
 
-// --- PRINCIPLE 2: Make the page an 'async' Server Component ---
+// --- Page Component (using your Promise pattern) ---
 export default async function SinglePhotoGalleryPage({
   params,
 }: {
-  params: { slug: string }; // Use standard Next.js App Router params
+  params: Promise<{ slug: string }>; // Using your news page's pattern
 }) {
-  // Fetch data directly on the server
+  const resolvedParams = await params; // Using your news page's pattern
+
   const gallery = await client.fetch<PhotoGallery>(
     PAGE_QUERY,
-    { slug: params.slug },
-    { next: { revalidate: 60 } } // Added revalidation (like news page)
+    { slug: resolvedParams.slug }, // Using resolvedParams here
+    { next: { revalidate: 60 } }
   );
 
-  // Handle "not found" state on the server
   if (!gallery) {
-    notFound(); // Use Next.js notFound helper
+    notFound();
   }
 
-  // Render the Client Component and pass the fetched data as props
-  // All client-side logic (useState/useEffect) is now in PhotoGalleryClient
+  // Pass the server-fetched data to the Client Component
   return <PhotoGalleryClient gallery={gallery} />;
 }
