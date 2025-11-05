@@ -1,10 +1,7 @@
-// FILE: src/app/merch/page.tsx
-
 import { type SanityDocument } from 'next-sanity';
 import { client } from '../../sanity/client';
-// CHANGE 1: Removed unused 'urlFor' import
 import Link from 'next/link';
-import Image from 'next/image'; // CHANGE 2: Import the Next.js Image component
+import Image from 'next/image'; // Import the Next.js Image component
 
 // This query fetches all merch products.
 const MERCH_QUERY = `*[_type == "merchProduct"]{
@@ -29,15 +26,17 @@ export default async function MerchPage() {
           <h1 className="text-4xl sm:text-6xl font-extrabold uppercase tracking-wider mb-4">
             МЕРЧ
           </h1>
-          {/* CHANGE 3: Replaced the apostrophe in "зв'яжіться" with "&apos;" */}
           <p className="text-lg text-gray-400 max-w-2xl mx-auto mb-16">
             Щоб замовити будь-який з наших товарів, будь ласка, зв&apos;яжіться
-            з нами через сторінку{' '}
+            з нами через{' '}
+            {/* CHANGE 1: Updated href, text, and added target/rel */}
             <Link
-              href="/contacts"
+              href="https://www.instagram.com/okazia.project?igsh=MWQ1d3F2aXZ0ODhnNw=="
+              target="_blank"
+              rel="noopener noreferrer"
               className="underline hover:text-white transition-colors"
             >
-              контактів
+              наш Instagram
             </Link>
             !
           </p>
@@ -47,9 +46,7 @@ export default async function MerchPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {products.map((product) => (
             <div key={product._id} className="group">
-              {/* CHANGE 4: Add 'relative' to the parent div */}
               <div className="relative aspect-square w-full bg-gray-800 rounded-lg overflow-hidden">
-                {/* CHANGE 5: Replace <img> with <Image> */}
                 <Image
                   src={product.imageUrl}
                   alt={`Photo of ${product.name}`}
@@ -68,8 +65,11 @@ export default async function MerchPage() {
 
         {/* Call to Action */}
         <div className="mt-20 text-center">
+          {/* CHANGE 2: Updated href and added target/rel */}
           <Link
-            href="/contacts"
+            href="https://www.instagram.com/okazia.project?igsh=MWQ1d3F2aXZ0ODhnNw=="
+            target="_blank"
+            rel="noopener noreferrer"
             className="inline-block bg-white text-black font-bold text-lg tracking-widest uppercase px-10 py-4 hover:bg-gray-200 transition-colors duration-300"
           >
             ЗАМОВИТИ
