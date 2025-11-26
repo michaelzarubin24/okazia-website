@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import Image from 'next/image';
 import {
   ChevronRight,
   ChevronLeft,
@@ -43,7 +42,6 @@ type QuizProps = {
 export default function QuizGame({ data }: QuizProps) {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
 
-  // Track user answers as an array of IDs (e.g. ['A', 'B', 'A', ...])
   const [userAnswers, setUserAnswers] = useState<(string | null)[]>(
     Array(data.questions.length).fill(null)
   );
@@ -51,23 +49,19 @@ export default function QuizGame({ data }: QuizProps) {
   const [showResult, setShowResult] = useState(false);
   const [winner, setWinner] = useState<ResultCharacter | null>(null);
 
-  // UI States
   const [isSharing, setIsSharing] = useState(false);
   const resultCardRef = useRef<HTMLDivElement>(null);
 
-  // Audio States
   const [isMuted, setIsMuted] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   // --- AUDIO EFFECT ---
   useEffect(() => {
-    // When a winner is decided and they have a ringtone
     if (showResult && winner?.ringtoneUrl) {
       const audio = new Audio(winner.ringtoneUrl);
-      audio.volume = 0.5; // 50% volume
+      audio.volume = 0.5;
       audioRef.current = audio;
 
-      // Try to auto-play (browser might block if no interaction occurred)
       const playPromise = audio.play();
       if (playPromise !== undefined) {
         playPromise.catch((error) => {
@@ -75,7 +69,6 @@ export default function QuizGame({ data }: QuizProps) {
         });
       }
 
-      // Cleanup: Stop sound if user leaves
       return () => {
         audio.pause();
         audio.currentTime = 0;
@@ -83,7 +76,6 @@ export default function QuizGame({ data }: QuizProps) {
     }
   }, [showResult, winner]);
 
-  // --- AUDIO TOGGLE ---
   const toggleAudio = () => {
     if (audioRef.current) {
       if (isMuted) {
@@ -101,9 +93,6 @@ export default function QuizGame({ data }: QuizProps) {
     const newAnswers = [...userAnswers];
     newAnswers[currentQuestionIndex] = pointsTo;
     setUserAnswers(newAnswers);
-
-    // Optional: Auto-advance after small delay
-    // setTimeout(() => handleNextStep(newAnswers), 300);
     handleNextStep(newAnswers);
   };
 
@@ -122,7 +111,6 @@ export default function QuizGame({ data }: QuizProps) {
   };
 
   const calculateWinner = (finalAnswers: (string | null)[]) => {
-    // 1. Tally scores
     const finalScores: Record<string, number> = {
       A: 0,
       B: 0,
@@ -137,12 +125,10 @@ export default function QuizGame({ data }: QuizProps) {
       if (charId && finalScores[charId] !== undefined) finalScores[charId]++;
     });
 
-    // 2. Find highest score
     const winningKey = Object.keys(finalScores).reduce((a, b) =>
       finalScores[a] > finalScores[b] ? a : b
     );
 
-    // 3. Get result object
     const resultData = data.results.find((r) => r.resultId === winningKey);
     if (resultData) {
       setWinner(resultData);
@@ -162,15 +148,15 @@ export default function QuizGame({ data }: QuizProps) {
     setIsMuted(false);
   };
 
-  // --- SHARE LOGIC (html2canvas) ---
+  // --- SHARE LOGIC ---
   const handleShare = async () => {
     if (!resultCardRef.current) return;
     setIsSharing(true);
     try {
       const canvas = await html2canvas(resultCardRef.current, {
-        useCORS: true, // Crucial for Sanity images
+        useCORS: true,
         backgroundColor: '#111827',
-        scale: 2, // Retine quality
+        scale: 2,
       });
 
       canvas.toBlob(async (blob) => {
@@ -180,7 +166,6 @@ export default function QuizGame({ data }: QuizProps) {
           type: 'image/png',
         });
 
-        // Mobile Native Share
         if (
           navigator.share &&
           navigator.canShare &&
@@ -196,7 +181,6 @@ export default function QuizGame({ data }: QuizProps) {
             console.log('Share dismissed', error);
           }
         } else {
-          // Desktop Download Fallback
           const link = document.createElement('a');
           link.download = 'okazia-result.png';
           link.href = canvas.toDataURL('image/png');
@@ -214,7 +198,6 @@ export default function QuizGame({ data }: QuizProps) {
   if (showResult && winner) {
     return (
       <div className="flex flex-col items-center animate-fade-in relative max-w-2xl mx-auto">
-        {/* Audio Control (Top Right) */}
         {winner.ringtoneUrl && (
           <button
             onClick={toggleAudio}
@@ -229,27 +212,30 @@ export default function QuizGame({ data }: QuizProps) {
           </button>
         )}
 
-        {/* --- SNAPSHOT AREA START --- */}
+        {/* --- SNAPSHOT AREA --- */}
         <div
           ref={resultCardRef}
           className="w-full text-center bg-gray-900 p-8 rounded-xl border border-white/10 relative overflow-hidden shadow-2xl"
         >
-          {/* Decorative Top Bar */}
           <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-purple-500 to-blue-500"></div>
 
           <h2 className="text-xl md:text-2xl font-bold mb-6 text-gray-400 tracking-wide mt-4">
             Мій персонаж:
           </h2>
 
+          {/* FIXED: Using Background Image instead of <img> tag */}
           {winner.imageUrl && (
-            <div className="relative w-48 h-48 md:w-64 md:h-64 mx-auto mb-6 rounded-full overflow-hidden border-4 border-white shadow-lg">
-              {/* Use standard img for better html2canvas CORS compatibility */}
-              <img
-                src={winner.imageUrl}
-                alt={winner.characterName}
-                className="w-full h-full object-cover"
-                crossOrigin="anonymous"
-              />
+            <div
+              className="relative w-48 h-48 md:w-64 md:h-64 mx-auto mb-6 rounded-full border-4 border-white shadow-lg overflow-hidden"
+              style={{
+                backgroundImage: `url(${winner.imageUrl})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                // Ensures colors are accurate in snapshot
+                WebkitPrintColorAdjust: 'exact',
+              }}
+            >
+              {/* Empty inner div, image is in background */}
             </div>
           )}
 
@@ -264,9 +250,8 @@ export default function QuizGame({ data }: QuizProps) {
             okazia.com.ua
           </div>
         </div>
-        {/* --- SNAPSHOT AREA END --- */}
 
-        {/* Action Buttons */}
+        {/* Buttons */}
         <div className="flex flex-col sm:flex-row gap-4 mt-8 w-full max-w-md px-4">
           <button
             onClick={handleShare}
@@ -301,7 +286,6 @@ export default function QuizGame({ data }: QuizProps) {
 
   return (
     <div className="max-w-3xl mx-auto px-4">
-      {/* Progress Bar */}
       <div className="w-full bg-gray-800 h-2 rounded-full mb-8 overflow-hidden">
         <div
           className="bg-white h-2 rounded-full transition-all duration-500 ease-out shadow-[0_0_10px_rgba(255,255,255,0.5)]"
@@ -309,7 +293,6 @@ export default function QuizGame({ data }: QuizProps) {
         ></div>
       </div>
 
-      {/* Question Card */}
       <div className="bg-gray-900/60 backdrop-blur-md p-6 md:p-10 rounded-2xl border border-white/10 relative shadow-xl">
         <h2 className="text-2xl md:text-3xl font-bold mb-8 text-center leading-tight min-h-[4rem] flex items-center justify-center">
           {question.questionText}
@@ -343,7 +326,6 @@ export default function QuizGame({ data }: QuizProps) {
           })}
         </div>
 
-        {/* Footer Navigation */}
         <div className="flex justify-between items-center mt-10 pt-6 border-t border-white/10">
           <button
             onClick={handleBackStep}
