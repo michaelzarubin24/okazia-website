@@ -71,6 +71,7 @@ export const Header = () => {
       ],
     },
     { name: 'КОНТАКТИ', href: '/contacts' },
+    { name: 'ТЕСТ', href: '/test' },
   ];
 
   const showFullHeader = !isScrolled || isHeaderHovered;
