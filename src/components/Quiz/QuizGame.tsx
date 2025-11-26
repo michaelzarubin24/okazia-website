@@ -4,18 +4,35 @@ import { useState } from 'react';
 import Image from 'next/image';
 import { ChevronRight, RefreshCw } from 'lucide-react';
 
+// 1. Define proper types to remove 'any' errors
+type Answer = {
+  answerText: string;
+  pointsTo: string;
+};
+
+type Question = {
+  questionText: string;
+  answers: Answer[];
+};
+
+type ResultCharacter = {
+  resultId: string;
+  characterName: string;
+  description: string;
+  imageUrl?: string;
+};
+
 type QuizProps = {
   data: {
     title: string;
-    results: any[];
-    questions: any[];
+    results: ResultCharacter[];
+    questions: Question[];
   };
 };
 
 export default function QuizGame({ data }: QuizProps) {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
 
-  // UPDATED: Initial state now tracks scores for A through H
   const [scores, setScores] = useState<Record<string, number>>({
     A: 0,
     B: 0,
@@ -28,16 +45,14 @@ export default function QuizGame({ data }: QuizProps) {
   });
 
   const [showResult, setShowResult] = useState(false);
-  const [winner, setWinner] = useState<any>(null);
+  // Fixed: typed as ResultCharacter or null
+  const [winner, setWinner] = useState<ResultCharacter | null>(null);
 
   const handleAnswer = (pointsTo: string) => {
-    // 1. Update score for the chosen character
-    // Using || 0 ensures safety if a new letter is introduced without updating initial state
     const currentScore = scores[pointsTo] || 0;
     const newScores = { ...scores, [pointsTo]: currentScore + 1 };
     setScores(newScores);
 
-    // 2. Move to next question or show results
     if (currentQuestionIndex < data.questions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
     } else {
@@ -46,15 +61,17 @@ export default function QuizGame({ data }: QuizProps) {
   };
 
   const calculateWinner = (finalScores: Record<string, number>) => {
-    // Find the key (A-H) with the highest value
     const winningKey = Object.keys(finalScores).reduce((a, b) =>
       finalScores[a] > finalScores[b] ? a : b
     );
 
-    // Find the full result object from Sanity data
     const resultData = data.results.find((r) => r.resultId === winningKey);
-    setWinner(resultData);
-    setShowResult(true);
+
+    // Safety check in case resultData is undefined
+    if (resultData) {
+      setWinner(resultData);
+      setShowResult(true);
+    }
   };
 
   const resetQuiz = () => {
@@ -120,7 +137,8 @@ export default function QuizGame({ data }: QuizProps) {
         </h2>
 
         <div className="grid gap-4">
-          {question.answers.map((answer: any, index: number) => (
+          {/* Fixed: Removed 'any' from map arguments, TypeScript infers it now */}
+          {question.answers.map((answer, index) => (
             <button
               key={index}
               onClick={() => handleAnswer(answer.pointsTo)}
