@@ -1,8 +1,16 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import Image from 'next/image';
-import { ChevronRight, ChevronLeft, RefreshCw, ArrowRight } from 'lucide-react';
+import {
+  ChevronRight,
+  ChevronLeft,
+  RefreshCw,
+  ArrowRight,
+  Share2,
+  Download,
+} from 'lucide-react';
+import html2canvas from 'html2canvas';
 
 // --- TYPES ---
 type Answer = {
@@ -32,9 +40,7 @@ type QuizProps = {
 
 export default function QuizGame({ data }: QuizProps) {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-
-  // CHANGED: Instead of a score object, we keep an array of selected character IDs
-  // e.g. ["A", "B", "A", null, null...]
+  // Track user answers
   const [userAnswers, setUserAnswers] = useState<(string | null)[]>(
     Array(data.questions.length).fill(null)
   );
@@ -42,40 +48,34 @@ export default function QuizGame({ data }: QuizProps) {
   const [showResult, setShowResult] = useState(false);
   const [winner, setWinner] = useState<ResultCharacter | null>(null);
 
-  // 1. Handle clicking an option
-  const handleAnswerSelect = (pointsTo: string) => {
-    // Create a copy of the answers array
-    const newAnswers = [...userAnswers];
+  // NEW: State for share loading
+  const [isSharing, setIsSharing] = useState(false);
+  // NEW: Ref to capture the specific DOM element
+  const resultCardRef = useRef<HTMLDivElement>(null);
 
-    // Record the answer for the current question index
+  // --- LOGIC ---
+  const handleAnswerSelect = (pointsTo: string) => {
+    const newAnswers = [...userAnswers];
     newAnswers[currentQuestionIndex] = pointsTo;
     setUserAnswers(newAnswers);
-
-    // Auto-advance after a short delay for better UX, or immediately
     handleNextStep(newAnswers);
   };
 
-  // 2. Logic to move forward (used by click and by "Next" button)
   const handleNextStep = (currentAnswersState = userAnswers) => {
-    // If it's the last question, calculate winner
     if (currentQuestionIndex === data.questions.length - 1) {
       calculateWinner(currentAnswersState);
     } else {
-      // Otherwise, go to next question
       setCurrentQuestionIndex((prev) => prev + 1);
     }
   };
 
-  // 3. Logic to move backward
   const handleBackStep = () => {
     if (currentQuestionIndex > 0) {
       setCurrentQuestionIndex((prev) => prev - 1);
     }
   };
 
-  // 4. Calculate Winner from the array history
   const calculateWinner = (finalAnswers: (string | null)[]) => {
-    // Tally up the scores from the array
     const finalScores: Record<string, number> = {
       A: 0,
       B: 0,
@@ -86,14 +86,10 @@ export default function QuizGame({ data }: QuizProps) {
       G: 0,
       H: 0,
     };
-
     finalAnswers.forEach((charId) => {
-      if (charId && finalScores[charId] !== undefined) {
-        finalScores[charId]++;
-      }
+      if (charId && finalScores[charId] !== undefined) finalScores[charId]++;
     });
 
-    // Find highest score
     const winningKey = Object.keys(finalScores).reduce((a, b) =>
       finalScores[a] > finalScores[b] ? a : b
     );
@@ -112,37 +108,125 @@ export default function QuizGame({ data }: QuizProps) {
     setWinner(null);
   };
 
+  // --- NEW: SHARE FUNCTIONALITY ---
+  const handleShare = async () => {
+    if (!resultCardRef.current) return;
+    setIsSharing(true);
+
+    try {
+      // 1. Generate Canvas from the div
+      const canvas = await html2canvas(resultCardRef.current, {
+        useCORS: true, // Important for loading external images (Sanity)
+        backgroundColor: '#111827', // Dark background for the image
+        scale: 2, // Higher quality
+      });
+
+      // 2. Convert to Blob
+      canvas.toBlob(async (blob) => {
+        if (!blob) return;
+
+        // 3. Prepare File for sharing
+        const file = new File([blob], 'okazia-result.png', {
+          type: 'image/png',
+        });
+
+        // 4. Try Native Sharing (Mobile)
+        if (
+          navigator.share &&
+          navigator.canShare &&
+          navigator.canShare({ files: [file] })
+        ) {
+          try {
+            await navigator.share({
+              files: [file],
+              title: 'Мій результат OKAZIA',
+              text: `Я - ${winner?.characterName}! Пройди тест на сайті OKAZIA.`,
+            });
+          } catch (error) {
+            console.log('Share dismissed', error);
+          }
+        } else {
+          // 5. Fallback: Download Image (Desktop)
+          const link = document.createElement('a');
+          link.download = 'okazia-result.png';
+          link.href = canvas.toDataURL('image/png');
+          link.click();
+        }
+        setIsSharing(false);
+      }, 'image/png');
+    } catch (err) {
+      console.error('Failed to generate image', err);
+      setIsSharing(false);
+    }
+  };
+
   // --- RENDER: RESULT SCREEN ---
   if (showResult && winner) {
     return (
-      <div className="max-w-2xl mx-auto text-center bg-gray-900/80 p-8 rounded-xl border border-white/10 animate-fade-in">
-        <h2 className="text-3xl font-bold mb-6">Твій результат:</h2>
-
-        {winner.imageUrl && (
-          <div className="relative w-64 h-64 mx-auto mb-6 rounded-full overflow-hidden border-4 border-white shadow-2xl">
-            <Image
-              src={winner.imageUrl}
-              alt={winner.characterName}
-              fill
-              className="object-cover"
-            />
-          </div>
-        )}
-
-        <h3 className="text-4xl md:text-5xl font-extrabold text-white mb-4 uppercase tracking-wider">
-          {winner.characterName}
-        </h3>
-        <p className="text-xl text-gray-300 mb-8 leading-relaxed">
-          {winner.description}
-        </p>
-
-        <button
-          onClick={resetQuiz}
-          className="inline-flex items-center bg-white text-black font-bold py-3 px-8 rounded-full hover:bg-gray-200 transition-colors"
+      <div className="flex flex-col items-center animate-fade-in">
+        {/* THIS DIV IS WHAT GETS PHOTOGRAPHED */}
+        <div
+          ref={resultCardRef}
+          className="max-w-md w-full text-center bg-gray-900 p-8 rounded-xl border border-white/10 relative overflow-hidden"
         >
-          <RefreshCw className="mr-2 h-5 w-5" />
-          Пройти знову
-        </button>
+          {/* Optional: Add a subtle background branding for the screenshot */}
+          <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-purple-500 to-blue-500"></div>
+
+          <h2 className="text-2xl font-bold mb-6 text-gray-400">
+            Мій персонаж:
+          </h2>
+
+          {winner.imageUrl && (
+            // Note: Use unoptimized or standard img for better html2canvas compatibility if needed
+            // But Next/Image usually works with useCORS: true
+            <div className="relative w-64 h-64 mx-auto mb-6 rounded-full overflow-hidden border-4 border-white shadow-2xl">
+              {/* Using standard img tag inside the screenshot area often reduces CORS issues */}
+              <img
+                src={winner.imageUrl}
+                alt={winner.characterName}
+                className="w-full h-full object-cover"
+                crossOrigin="anonymous"
+              />
+            </div>
+          )}
+
+          <h3 className="text-4xl font-extrabold text-white mb-4 uppercase tracking-wider">
+            {winner.characterName}
+          </h3>
+          <p className="text-lg text-gray-300 mb-6 leading-relaxed">
+            {winner.description}
+          </p>
+
+          <div className="mt-4 text-sm text-gray-500 uppercase tracking-widest">
+            okazia.com.ua
+          </div>
+        </div>
+
+        {/* BUTTONS (Outside the screenshot area) */}
+        <div className="flex flex-col sm:flex-row gap-4 mt-8 w-full max-w-md">
+          <button
+            onClick={handleShare}
+            disabled={isSharing}
+            className="flex-1 inline-flex justify-center items-center bg-blue-600 text-white font-bold py-3 px-6 rounded-full hover:bg-blue-700 transition-colors disabled:opacity-50"
+          >
+            {isSharing ? (
+              <span className="animate-pulse">Створюю...</span>
+            ) : (
+              <>
+                <Share2 className="mr-2 h-5 w-5" />
+                Поділитися
+              </>
+            )}
+          </button>
+
+          <button
+            onClick={resetQuiz}
+            className="flex-1 inline-flex justify-center items-center bg-gray-800 text-white font-bold py-3 px-6 rounded-full hover:bg-gray-700 border border-gray-600 transition-colors"
+          >
+            <RefreshCw className="mr-2 h-5 w-5" />
+            Ще раз
+          </button>
+        </div>
       </div>
     );
   }
@@ -150,8 +234,6 @@ export default function QuizGame({ data }: QuizProps) {
   // --- RENDER: QUESTION SCREEN ---
   const question = data.questions[currentQuestionIndex];
   const progress = ((currentQuestionIndex + 1) / data.questions.length) * 100;
-
-  // Check if we have an answer recorded for this specific question
   const currentSelectedAnswer = userAnswers[currentQuestionIndex];
 
   return (
@@ -172,9 +254,7 @@ export default function QuizGame({ data }: QuizProps) {
 
         <div className="grid gap-4">
           {question.answers.map((answer, index) => {
-            // Check if this specific button was the selected one
             const isSelected = currentSelectedAnswer === answer.pointsTo;
-
             return (
               <button
                 key={index}
@@ -182,13 +262,12 @@ export default function QuizGame({ data }: QuizProps) {
                 className={`w-full text-left p-5 border rounded-xl transition-all duration-200 group flex justify-between items-center
                   ${
                     isSelected
-                      ? 'bg-white text-black border-white ring-2 ring-white/50' // Active Style
-                      : 'bg-gray-800 text-white border-gray-700 hover:bg-gray-700 hover:border-gray-500' // Default Style
+                      ? 'bg-white text-black border-white ring-2 ring-white/50'
+                      : 'bg-gray-800 text-white border-gray-700 hover:bg-gray-700 hover:border-gray-500'
                   }
                 `}
               >
                 <span className="text-lg font-medium">{answer.answerText}</span>
-                {/* Show Checkmark if selected, otherwise Chevron */}
                 {isSelected ? (
                   <div className="w-5 h-5 bg-black text-white rounded-full flex items-center justify-center text-xs">
                     ✓
@@ -203,7 +282,6 @@ export default function QuizGame({ data }: QuizProps) {
 
         {/* NAVIGATION CONTROLS */}
         <div className="flex justify-between items-center mt-8 pt-6 border-t border-white/10">
-          {/* BACK BUTTON (Hidden on first question) */}
           <button
             onClick={handleBackStep}
             disabled={currentQuestionIndex === 0}
@@ -219,12 +297,10 @@ export default function QuizGame({ data }: QuizProps) {
             Назад
           </button>
 
-          {/* Question Counter */}
           <span className="text-gray-600 text-sm font-mono">
             {currentQuestionIndex + 1} / {data.questions.length}
           </span>
 
-          {/* NEXT BUTTON (Only visible if they have already answered this question) */}
           <button
             onClick={() => handleNextStep()}
             disabled={!currentSelectedAnswer}
