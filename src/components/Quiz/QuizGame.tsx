@@ -55,23 +55,43 @@ export default function QuizGame({ data }: QuizProps) {
   const [isMuted, setIsMuted] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  // --- AUDIO EFFECT ---
-  useEffect(() => {
-    if (showResult && winner?.ringtoneUrl) {
-      const audio = new Audio(winner.ringtoneUrl);
-      audio.volume = 0.5;
-      audioRef.current = audio;
+  // NEW: Ref to ensure we only count stats once per game
+  const hasRecordedStats = useRef(false);
 
-      const playPromise = audio.play();
-      if (playPromise !== undefined) {
-        playPromise.catch((error) => {
-          console.log('Auto-play prevented by browser:', error);
-        });
+  // --- AUDIO & STATS EFFECT ---
+  useEffect(() => {
+    if (showResult && winner) {
+      // 1. Play Audio
+      if (winner.ringtoneUrl) {
+        const audio = new Audio(winner.ringtoneUrl);
+        audio.volume = 0.5;
+        audioRef.current = audio;
+        const playPromise = audio.play();
+        if (playPromise !== undefined) {
+          playPromise.catch((error) =>
+            console.log('Auto-play prevented:', error)
+          );
+        }
       }
 
+      // 2. Record Statistics (Only once)
+      if (!hasRecordedStats.current) {
+        hasRecordedStats.current = true;
+
+        // Fire and forget - we don't need to wait for the response
+        fetch('/api/quiz/stats', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ resultId: winner.resultId }),
+        }).catch((err) => console.error('Failed to record stats:', err));
+      }
+
+      // Cleanup
       return () => {
-        audio.pause();
-        audio.currentTime = 0;
+        if (audioRef.current) {
+          audioRef.current.pause();
+          audioRef.current.currentTime = 0;
+        }
       };
     }
   }, [showResult, winner]);
@@ -146,6 +166,8 @@ export default function QuizGame({ data }: QuizProps) {
     setShowResult(false);
     setWinner(null);
     setIsMuted(false);
+    // Reset stats lock so they can record again if they replay
+    hasRecordedStats.current = false;
   };
 
   // --- SHARE LOGIC ---
@@ -161,7 +183,6 @@ export default function QuizGame({ data }: QuizProps) {
 
       canvas.toBlob(async (blob) => {
         if (!blob) return;
-
         const file = new File([blob], 'okazia-result.png', {
           type: 'image/png',
         });
@@ -223,7 +244,6 @@ export default function QuizGame({ data }: QuizProps) {
             Мій персонаж:
           </h2>
 
-          {/* FIXED: Using Background Image instead of <img> tag */}
           {winner.imageUrl && (
             <div
               className="relative w-48 h-48 md:w-64 md:h-64 mx-auto mb-6 rounded-full border-4 border-white shadow-lg overflow-hidden"
@@ -231,12 +251,9 @@ export default function QuizGame({ data }: QuizProps) {
                 backgroundImage: `url(${winner.imageUrl})`,
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
-                // Ensures colors are accurate in snapshot
                 WebkitPrintColorAdjust: 'exact',
               }}
-            >
-              {/* Empty inner div, image is in background */}
-            </div>
+            ></div>
           )}
 
           <h3 className="text-3xl md:text-5xl font-extrabold text-white mb-4 uppercase tracking-wider">
