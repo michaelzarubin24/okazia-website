@@ -38,8 +38,12 @@ export async function POST(req: Request) {
       .commit();
 
     return NextResponse.json({ message: "Stats updated" });
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("Stats Update Error:", err);
-    return NextResponse.json({ error: err.message }, { status: 500 });
+    
+    // SAFE ERROR HANDLING (Removes 'any')
+    const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+    
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }
