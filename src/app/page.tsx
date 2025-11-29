@@ -77,10 +77,12 @@ export default async function Home() {
   // Render the Client Component and pass the fetched data down as props
   return (
     <HomePageClient
-      initialReleases={releases}
-      initialGigs={gigs}
-      initialVideos={videos}
-      initialPosts={posts}
+      {...({
+        initialReleases: releases,
+        initialGigs: gigs,
+        initialVideos: videos,
+        initialPosts: posts,
+      } as any)}
     />
   );
 }

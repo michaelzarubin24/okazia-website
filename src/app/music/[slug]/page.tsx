@@ -35,8 +35,8 @@ export default async function AlbumPage({
   const resolvedParams = await params;
   const album = await client.fetch<SanityDocument>(
     ALBUM_QUERY,
-    { slug: resolvedParams.slug },
-    { next: { revalidate: 60 } }
+    { slug: resolvedParams.slug }
+    // { next: { revalidate: 60 } }
   );
 
   if (!album) {
