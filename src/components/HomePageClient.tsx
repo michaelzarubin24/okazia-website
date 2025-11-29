@@ -18,7 +18,6 @@ const getYouTubeThumbnail = (url: string) => {
 };
 
 // --- FUTURE GIGS COMPONENT ---
-// UPDATED: Now accepts title and button texts as props
 const FutureGigs = ({
   gigs,
   title,
@@ -38,7 +37,7 @@ const FutureGigs = ({
       <div className="container mx-auto px-4 text-center">
         <h2 className="text-3xl sm:text-4xl font-bold mb-12">
           {/* Use dynamic title from Sanity */}
-          ————  {title}  ————
+          ———— {title} ————
         </h2>
         <div className="max-w-4xl mx-auto space-y-8">
           {gigs.map((gig) => (
@@ -96,7 +95,6 @@ const FutureGigs = ({
 };
 
 // --- LATEST RELEASES CAROUSEL ---
-// UPDATED: Accepts title as prop
 const LatestReleasesCarousel = ({
   releases,
   title,
@@ -137,7 +135,7 @@ const LatestReleasesCarousel = ({
     <section className="py-16 sm:py-24 bg-black">
       <div className="container mx-auto px-4 text-center">
         <h2 className="text-3xl sm:text-4xl font-bold mb-12">
-          ————  {title}  ————
+          ———— {title} ————
         </h2>
         <div className="relative w-full">
           <button
@@ -249,7 +247,6 @@ const OtherVideosCarousel = ({ videos }: { videos: SanityDocument[] }) => {
 };
 
 // --- LATEST NEWS GRID ---
-// UPDATED: Accepts title as prop
 const LatestNewsCarousel = ({
   posts,
   title,
@@ -262,7 +259,7 @@ const LatestNewsCarousel = ({
     <section className="py-16 sm:py-24 bg-black">
       <div className="container mx-auto px-4 text-center">
         <h2 className="text-3xl sm:text-4xl font-bold mb-12">
-          ————  {title}  ————
+          ———— {title} ————
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {posts.map((post) => (
@@ -301,8 +298,18 @@ const LatestNewsCarousel = ({
 };
 
 // --- NEWSLETTER FORM ---
-// UPDATED: Accepts data props
-const NewsletterForm = ({ data }: { data: any }) => {
+
+// Type definition to fix the "Unexpected any" error
+interface NewsletterSectionData {
+  title?: string;
+  description?: string;
+  placeholder?: string;
+  buttonText?: string;
+  successMessage?: string;
+  errorMessage?: string;
+}
+
+const NewsletterForm = ({ data }: { data?: NewsletterSectionData }) => {
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState('idle');
   const [message, setMessage] = useState('');
@@ -520,7 +527,7 @@ export default function Home() {
       <section className="py-16 sm:py-24 bg-black">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl sm:text-4xl font-bold mb-12">
-            ————  {homeData?.sectionTitles?.videoTitle || 'ВІДЕО'}  ————
+            ———— {homeData?.sectionTitles?.videoTitle || 'ВІДЕО'} ————
           </h2>
           <div className="relative h-[60vh] sm:h-[75vh] w-full overflow-hidden rounded-lg">
             {homeData?.videoSection?.videoFileUrl && (
