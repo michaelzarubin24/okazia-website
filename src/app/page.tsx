@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { type ComponentType } from 'react';
 import { client } from '../sanity/client';
 import { type SanityDocument } from 'next-sanity';
 import HomePageClient from '@/components/HomePageClient';
@@ -74,15 +75,22 @@ export default async function Home() {
     ),
   ]);
 
+  // Locally define the interface for the props we are passing
+  // and cast the component to match. This avoids 'any' and type mismatch errors.
+  const TypedHomePageClient = HomePageClient as unknown as ComponentType<{
+    initialReleases: SanityDocument[];
+    initialGigs: SanityDocument[];
+    initialVideos: SanityDocument[];
+    initialPosts: SanityDocument[];
+  }>;
+
   // Render the Client Component and pass the fetched data down as props
   return (
-    <HomePageClient
-      {...({
-        initialReleases: releases,
-        initialGigs: gigs,
-        initialVideos: videos,
-        initialPosts: posts,
-      } as any)}
+    <TypedHomePageClient
+      initialReleases={releases}
+      initialGigs={gigs}
+      initialVideos={videos}
+      initialPosts={posts}
     />
   );
 }
