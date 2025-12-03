@@ -1,15 +1,16 @@
 import type { Metadata } from 'next';
+import Script from 'next/script';
 import './globals.css';
-import { Header } from '@/components/Header'; // Import the new Header component
-import { SocialIcons } from '@/components/SocialIcons'; // Import the new SocialIcons component
+import { Header } from '@/components/Header';
+import { SocialIcons } from '@/components/SocialIcons';
+
 export const metadata: Metadata = {
   title: {
-    template: '%s | OKAZIA', // Appends "| OKAZIA" to all page titles
-    default: 'OKAZIA - Офіційний сайт', // Default title for homepage
+    template: '%s | OKAZIA',
+    default: 'OKAZIA - Офіційний сайт',
   },
   description:
     'Офіційний сайт українського інді-рок гурту з Харкова. Дізнайся першим про нові релізи та концерти!',
-  // Metadata for social media sharing (Open Graph)
   keywords: [
     'OKAZIA',
     'Оказія',
@@ -22,7 +23,6 @@ export const metadata: Metadata = {
     'indie rock Ukraine',
     'нова українська музика',
   ],
-
   openGraph: {
     title: 'OKAZIA - Офіційний сайт',
     description: 'Офіційний сайт українського інді-рок гурту з Харкова.',
@@ -38,12 +38,11 @@ export const metadata: Metadata = {
     locale: 'uk_UA',
     type: 'website',
   },
-  // Metadata for Twitter sharing
   twitter: {
     card: 'summary_large_image',
     title: 'OKAZIA - Офіційний сайт',
     description: 'Офіційний сайт українського інді-рок гурту з Харкова.',
-    images: ['https://www.okazia.com.ua/images/photo-all-2.png'], // URL to your social sharing image
+    images: ['https://www.okazia.com.ua/images/photo-all-2.png'],
   },
 };
 
@@ -55,6 +54,21 @@ export default function RootLayout({
   return (
     <html lang="uk">
       <body className="font-sans text-white bg-black">
+        {/* Google Analytics 4 Script */}
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-ZPNRRRVK1X"
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+
+            gtag('config', 'G-ZPNRRRVK1X');
+          `}
+        </Script>
+
         <div className="fixed inset-0 z-[-1] opacity-30" />
         <Header />
         <main className="pb-24">{children}</main>
