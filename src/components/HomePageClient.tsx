@@ -1,4 +1,4 @@
-'use client'; // This enables browser-side interactivity for the form and carousel.
+'use client';
 
 import { useState, useEffect, useRef } from 'react';
 import { type SanityDocument } from 'next-sanity';
@@ -15,6 +15,33 @@ const getYouTubeThumbnail = (url: string) => {
     return `https://img.youtube.com/vi/${videoIdMatch[1]}/hqdefault.jpg`;
   }
   return '';
+};
+
+// --- PRE-RELEASE WIDGET ---
+const PreReleaseWidget = () => {
+  return (
+    <section className="py-12 bg-black border-b border-gray-900">
+      <div className="container mx-auto px-4 text-center">
+        <h2 className="text-2xl sm:text-3xl font-bold mb-8 uppercase tracking-widest text-white">
+          ———— PRE-SAVE ————
+        </h2>
+        <div className="max-w-3xl mx-auto">
+          {/* Container with specific styling to ensure the iframe 
+            looks integrated and responsive 
+          */}
+          <div className="rounded-lg overflow-hidden shadow-2xl bg-[#1a1a1a]">
+            <iframe
+              src="https://show.co/social-unlock/2EeqDZjhqjKQB5YaGRBwGF/widget"
+              width="100%"
+              height="300"
+              frameBorder="0"
+              style={{ display: 'block' }}
+            ></iframe>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
 };
 
 // --- FUTURE GIGS COMPONENT ---
@@ -511,6 +538,9 @@ export default function Home() {
           )}
         </div>
       </section>
+
+      {/* --- PRE-RELEASE WIDGET INSERTED HERE --- */}
+      <PreReleaseWidget />
 
       <FutureGigs
         gigs={futureGigs}
