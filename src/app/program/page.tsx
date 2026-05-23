@@ -4,13 +4,14 @@ import React, { useState, useEffect } from 'react';
 import { X, Music, Loader2 } from 'lucide-react';
 import { client } from '../../sanity/client'; // Adjust this path if your Sanity client is elsewhere
 import { PortableText } from '@portabletext/react';
+import type { PortableTextBlock } from '@portabletext/types';
 import Link from 'next/link';
 
 // Define the types for our Sanity data
 interface Track {
   _id: string;
   title: string;
-  lyrics: any; // Using 'any' for Portable Text blocks, or PortableTextBlock[] if you have the types set up
+  lyrics: PortableTextBlock[]; // Using the correct type for Portable Text blocks
 }
 
 interface Setlist {
