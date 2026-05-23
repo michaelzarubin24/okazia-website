@@ -68,6 +68,7 @@ export const Header = () => {
       dropdown: [
         { name: 'МАЙБУТНІ', href: '/gigs/future' },
         { name: 'АРХІВ', href: '/gigs/past' },
+        { name: 'СОЛЬНИК 6.06', href: '/program' },
       ],
     },
     { name: 'КОНТАКТИ', href: '/contacts' },
