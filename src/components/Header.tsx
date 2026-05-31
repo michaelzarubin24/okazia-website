@@ -57,8 +57,8 @@ export const Header = () => {
     {
       name: 'МЕДІА',
       dropdown: [
-        { name: 'ФОТО', href: '/photos' }, // Новий лінк для фотогалереї
-        { name: 'ВІДЕО', href: '/videos' }, // Існуючий лінк, тепер вкладений
+        { name: 'ФОТО', href: '/photos' },
+        { name: 'ВІДЕО', href: '/videos' },
       ],
     },
     { name: 'НОВИНИ', href: '/news' },
@@ -71,8 +71,14 @@ export const Header = () => {
         { name: 'СОЛЬНИК 6.06', href: '/program' },
       ],
     },
+    {
+      name: 'ІГРИ',
+      dropdown: [
+        { name: 'ТЕСТ', href: '/test' },
+        { name: 'РЕЙТИНГ ТРЕКІВ', href: '/tierlist' },
+      ],
+    },
     { name: 'КОНТАКТИ', href: '/contacts' },
-    { name: 'ТЕСТ', href: '/test' },
   ];
 
   const showFullHeader = !isScrolled || isHeaderHovered;
