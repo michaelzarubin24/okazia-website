@@ -45,11 +45,13 @@ const FutureGigs = ({
               key={gig._id}
               className="flex flex-col md:flex-row items-center gap-6 md:gap-8 p-6 bg-gray-800/50 rounded-lg"
             >
-              <div className="w-full md:w-1/3 flex-shrink-0">
-                <img
+              <div className="relative w-full md:w-1/3 aspect-[3/4] flex-shrink-0">
+                <Image
                   src={gig.posterImageUrl}
                   alt={`Poster for ${gig.title}`}
-                  className="w-full h-auto rounded-md shadow-lg"
+                  fill
+                  sizes="(max-width: 768px) 100vw, 33vw"
+                  className="rounded-md shadow-lg object-cover"
                 />
               </div>
               <div className="flex-grow text-center md:text-left">
@@ -173,10 +175,12 @@ const LatestReleasesCarousel = ({
                   >
                     <Link href={linkHref} className="block w-full">
                       <div className="relative aspect-square w-full bg-gray-800 rounded-lg overflow-hidden transform transition-transform duration-300 group-hover:scale-105">
-                        <img
+                        <Image
                           src={release.artworkUrl}
                           alt={release.title}
-                          className="w-full h-full object-cover"
+                          fill
+                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                          className="object-cover"
                         />
                         <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center p-4">
                           <h3 className="text-white font-bold text-center text-lg sm:text-xl">
@@ -219,11 +223,13 @@ const OtherVideosCarousel = ({ videos }: { videos: SanityDocument[] }) => {
             rel="noopener noreferrer"
             className="group"
           >
-            <div className="aspect-video w-full bg-gray-800 rounded-lg overflow-hidden">
-              <img
+            <div className="relative aspect-video w-full bg-gray-800 rounded-lg overflow-hidden">
+              <Image
                 src={getYouTubeThumbnail(video.youtubeUrl)}
                 alt={video.title}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                fill
+                sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 25vw"
+                className="object-cover group-hover:scale-105 transition-transform duration-300"
               />
             </div>
             <p className="text-white font-semibold mt-2 truncate">
@@ -264,11 +270,13 @@ const LatestNewsCarousel = ({
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {posts.map((post) => (
             <Link key={post._id} href={`/news/${post.slug}`} className="group">
-              <div className="aspect-video w-full bg-gray-800 rounded-lg overflow-hidden">
-                <img
+              <div className="relative aspect-video w-full bg-gray-800 rounded-lg overflow-hidden">
+                <Image
                   src={post.mainImageUrl}
                   alt={post.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  fill
+                  sizes="(max-width: 768px) 100vw, 33vw"
+                  className="object-cover group-hover:scale-105 transition-transform duration-300"
                 />
               </div>
               <p className="text-gray-400 text-sm mt-4">
@@ -478,21 +486,31 @@ export default function Home() {
       {/* Hero Section */}
       <section className="relative w-full min-h-[50vh] flex items-center justify-center bg-black md:h-screen">
         {homeData?.heroSection?.mainImageUrl && (
-          <img
-            src={homeData.heroSection.mainImageUrl}
-            alt="Band Photo"
-            className="hidden md:block w-full h-full object-cover absolute inset-0"
-          />
+          <div className="hidden md:block absolute inset-0">
+            <Image
+              src={homeData.heroSection.mainImageUrl}
+              alt="Band Photo"
+              fill
+              priority
+              className="object-cover"
+              sizes="100vw"
+            />
+          </div>
         )}
         <div className="absolute inset-0 bg-black opacity-50 md:hidden"></div>
         <div className="absolute inset-0 bg-black opacity-30 hidden md:block"></div>
         <div className="relative z-10 p-4 sm:p-8 flex flex-col items-center text-center text-white">
           {homeData?.heroSection?.logoUrl && (
-            <img
-              src={homeData.heroSection.logoUrl}
-              alt="OKAZIA Logo"
-              className="w-full max-w-sm sm:max-w-lg md:max-w-xl"
-            />
+            <div className="relative w-full max-w-sm sm:max-w-lg md:max-w-xl aspect-[3/1]">
+              <Image
+                src={homeData.heroSection.logoUrl}
+                alt="OKAZIA Logo"
+                fill
+                priority
+                className="object-contain"
+                sizes="(max-width: 768px) 100vw, 600px"
+              />
+            </div>
           )}
           <p className="text-xl sm:text-2xl md:text-3xl uppercase tracking-[0.1em] sm:tracking-[0.18em] mt-4">
             {homeData?.heroSection?.tagline || 'МУЗИЧНА ОКАЗІЯ З ХАРКОВА'}
@@ -515,7 +533,7 @@ export default function Home() {
       <FutureGigs
         gigs={futureGigs}
         title={homeData?.sectionTitles?.futureGigsTitle || 'АНОНСИ'}
-        ticketsText="Квитки" // You can add fields for these too if you want
+        ticketsText="Квитки"
         detailsText="Деталі"
       />
 
@@ -570,10 +588,12 @@ export default function Home() {
       {/* PROMO SECTION 1 (e.g. Tour) */}
       {homeData?.promoSection1?.imageUrl && (
         <section className="hidden md:block relative w-full h-[70vh]">
-          <img
+          <Image
             src={homeData.promoSection1.imageUrl}
             alt={homeData.promoSection1.title}
-            className="w-full h-full object-cover"
+            fill
+            sizes="100vw"
+            className="object-cover"
           />
           <div className="absolute inset-0 bg-black opacity-20"></div>
           <div className="absolute inset-0 flex flex-col items-center justify-center z-10 p-4 sm:p-8 text-center">
@@ -602,10 +622,12 @@ export default function Home() {
       {/* PROMO SECTION 2 (e.g. Concert) */}
       {homeData?.promoSection2?.imageUrl && (
         <section className="hidden md:block relative w-full h-[70vh]">
-          <img
+          <Image
             src={homeData.promoSection2.imageUrl}
             alt={homeData.promoSection2.title}
-            className="w-full h-full object-cover"
+            fill
+            sizes="100vw"
+            className="object-cover"
           />
           <div className="absolute inset-0 bg-black opacity-20"></div>
           <div className="absolute inset-0 flex items-end justify-center z-10 p-4 sm:p-8 md:p-12">
