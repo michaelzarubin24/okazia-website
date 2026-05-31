@@ -7,7 +7,7 @@ import { Loader2, Download, Share2, GripHorizontal } from 'lucide-react';
 import {
   DndContext,
   DragOverlay,
-  pointerWithin, // Updated collision detection
+  pointerWithin,
   KeyboardSensor,
   PointerSensor,
   useSensor,
@@ -51,7 +51,7 @@ const TrackItemUI = ({
   isDragging?: boolean;
 }) => (
   <div
-    className={`w-16 h-16 sm:w-20 sm:h-20 bg-gray-800 overflow-hidden relative flex-shrink-0 cursor-grab active:cursor-grabbing border border-gray-700 select-none touch-none ${
+    className={`w-16 h-16 sm:w-20 sm:h-20 bg-gray-900 overflow-hidden relative flex-shrink-0 cursor-grab active:cursor-grabbing border border-gray-700 select-none touch-none ${
       isDragging
         ? 'opacity-50 ring-4 ring-white z-50 scale-105 shadow-2xl'
         : 'hover:scale-105 transition-transform duration-200'
@@ -62,6 +62,7 @@ const TrackItemUI = ({
         src={track.artworkUrl}
         alt={track.title}
         crossOrigin="anonymous"
+        decoding="async"
         className="w-full h-full object-cover pointer-events-none"
       />
     )}
@@ -99,7 +100,7 @@ const SortableTrack = ({ track }: { track: Track }) => {
   );
 };
 
-// The wrapper that makes a tier or pool a droppable zone (updated for empty tiers)
+// The wrapper that makes a tier or pool a droppable zone
 const DroppableZone = ({
   id,
   items,
@@ -119,7 +120,6 @@ const DroppableZone = ({
       items={items.map((i) => i._id)}
       strategy={rectSortingStrategy}
     >
-      {/* Added w-full and min-h-[100px] to enforce physical drop zones even when empty */}
       <div ref={setNodeRef} className={`w-full min-h-[100px] ${className}`}>
         {children}
       </div>
@@ -144,7 +144,7 @@ export default function TierListPage() {
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        distance: 5, // Prevents accidental drags when clicking/scrolling
+        distance: 5,
       },
     }),
     useSensor(KeyboardSensor, {
@@ -152,14 +152,15 @@ export default function TierListPage() {
     })
   );
 
-  // Fetch Tracks from Sanity
+  // Fetch Tracks from Sanity with optimized image loading
   useEffect(() => {
     const fetchTracks = async () => {
       try {
+        // Appending image API parameters to fetch small, perfectly cropped thumbnails
         const TRACKS_QUERY = `*[_type == "track" && count(*[_type == "musicRelease" && references(^._id)]) > 0]{
           _id,
           title,
-          "artworkUrl": *[_type == "musicRelease" && references(^._id)][0].artwork.asset->url
+          "artworkUrl": *[_type == "musicRelease" && references(^._id)][0].artwork.asset->url + "?w=200&h=200&fit=crop&fm=jpg&q=80"
         }`;
         const data = await client.fetch(TRACKS_QUERY);
         setTierState((prev) => ({ ...prev, UNRANKED: data }));
@@ -216,7 +217,7 @@ export default function TierListPage() {
 
       let newIndex;
       if (overId in prev) {
-        newIndex = overItems.length + 1; // Dropped on an empty container
+        newIndex = overItems.length + 1;
       } else {
         const isBelowLastItem =
           over && overIndex === overItems.length - 1 && event.delta.y > 0;
@@ -321,7 +322,7 @@ export default function TierListPage() {
 
         <DndContext
           sensors={sensors}
-          collisionDetection={pointerWithin} // Use pointerWithin for accurate dropping in empty zones
+          collisionDetection={pointerWithin}
           onDragStart={handleDragStart}
           onDragOver={handleDragOver}
           onDragEnd={handleDragEnd}
