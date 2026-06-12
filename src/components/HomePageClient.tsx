@@ -36,7 +36,6 @@ const FutureGigs = ({
     <section className="py-16 sm:py-24 bg-black">
       <div className="container mx-auto px-4 text-center">
         <h2 className="text-3xl sm:text-4xl font-bold mb-12">
-          {/* Use dynamic title from Sanity */}
           ———— {title} ————
         </h2>
         <div className="max-w-4xl mx-auto space-y-8">
@@ -74,7 +73,6 @@ const FutureGigs = ({
                       rel="noopener noreferrer"
                       className="inline-block w-full sm:w-auto text-center bg-white text-black font-bold uppercase tracking-wider px-8 py-3 rounded-md hover:bg-gray-200 transition-colors"
                     >
-                      {/* Use dynamic button text */}
                       {ticketsText}
                     </a>
                   ) : (
@@ -82,7 +80,6 @@ const FutureGigs = ({
                       href={`/gigs/archive/${gig.slug}`}
                       className="inline-block w-full sm:w-auto text-center bg-gray-600 text-white font-bold uppercase tracking-wider px-8 py-3 rounded-md hover:bg-gray-500 transition-colors"
                     >
-                      {/* Use dynamic button text */}
                       {detailsText}
                     </Link>
                   )}
@@ -306,8 +303,6 @@ const LatestNewsCarousel = ({
 };
 
 // --- NEWSLETTER FORM ---
-
-// Type definition to fix the "Unexpected any" error
 interface NewsletterSectionData {
   title?: string;
   description?: string;
@@ -324,7 +319,6 @@ const NewsletterForm = ({ data }: { data?: NewsletterSectionData }) => {
   const MAILCHIMP_URL =
     'https://gmail.us15.list-manage.com/subscribe/post?u=4fdcb783d461acf4d88126353&id=c84bd47487&f_id=00d2a2e1f0';
 
-  // Use data from Sanity or defaults
   const title = data?.title || 'Підписуйтесь на наші новини!';
   const desc =
     data?.description ||
@@ -397,7 +391,6 @@ const LATEST_RELEASES_QUERY = `*[_type == "musicRelease"]|order(releaseDate desc
 const FUTURE_GIGS_QUERY = `*[_type == "gig" && date >= now()]|order(date asc){_id, title, date, venue, city, ticketsUrl, "slug": slug.current, "posterImageUrl": posterImageUrl.asset->url}`;
 const VIDEOS_QUERY = `*[_type == "video"]|order(order asc){_id, title, youtubeUrl}`;
 const LATEST_POSTS_QUERY = `*[_type == "post"]|order(publishedAt desc)[0...3]{_id, title, "slug": slug.current, publishedAt, "mainImageUrl": mainImage.asset->url}`;
-// NEW: Query for Home Page content
 const HOME_PAGE_QUERY = `*[_type == "homePage"][0]{
   heroSection {
     "mainImageUrl": mainImage.asset->url,
@@ -497,9 +490,12 @@ export default function Home() {
             />
           </div>
         )}
-        <div className="absolute inset-0 bg-black opacity-50 md:hidden"></div>
-        <div className="absolute inset-0 bg-black opacity-30 hidden md:block"></div>
-        <div className="relative z-10 p-4 sm:p-8 flex flex-col items-center text-center text-white">
+
+        {/* Затемнення фону */}
+        <div className="absolute inset-0 bg-black opacity-70 md:hidden"></div>
+        <div className="absolute inset-0 bg-black opacity-60 hidden md:block"></div>
+
+        <div className="relative z-10 p-4 sm:p-8 flex flex-col items-center text-center text-white mt-12">
           {homeData?.heroSection?.logoUrl && (
             <div className="relative w-full max-w-sm sm:max-w-lg md:max-w-xl aspect-[3/1]">
               <Image
@@ -585,7 +581,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* PROMO SECTION 1 (e.g. Tour) */}
+      {/* PROMO SECTION 1 */}
       {homeData?.promoSection1?.imageUrl && (
         <section className="hidden md:block relative w-full h-[70vh]">
           <Image
@@ -619,7 +615,7 @@ export default function Home() {
         </section>
       )}
 
-      {/* PROMO SECTION 2 (e.g. Concert) */}
+      {/* PROMO SECTION 2 */}
       {homeData?.promoSection2?.imageUrl && (
         <section className="hidden md:block relative w-full h-[70vh]">
           <Image
