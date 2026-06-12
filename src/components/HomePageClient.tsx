@@ -44,14 +44,21 @@ const FutureGigs = ({
               key={gig._id}
               className="flex flex-col md:flex-row items-center gap-6 md:gap-8 p-6 bg-gray-800/50 rounded-lg"
             >
-              <div className="relative w-full md:w-1/3 aspect-[3/4] flex-shrink-0">
-                <Image
-                  src={gig.posterImageUrl}
-                  alt={`Poster for ${gig.title}`}
-                  fill
-                  sizes="(max-width: 768px) 100vw, 33vw"
-                  className="rounded-md shadow-lg object-cover"
-                />
+              <div className="w-full md:w-1/3 flex-shrink-0">
+                {gig.posterImage?.metadata?.dimensions ? (
+                  <Image
+                    src={gig.posterImage.url}
+                    alt={`Poster for ${gig.title}`}
+                    width={gig.posterImage.metadata.dimensions.width}
+                    height={gig.posterImage.metadata.dimensions.height}
+                    className="w-full h-auto rounded-md shadow-lg"
+                    sizes="(max-width: 768px) 100vw, 33vw"
+                  />
+                ) : (
+                  <div className="w-full h-auto aspect-[2/3] bg-gray-900 rounded-md flex items-center justify-center">
+                    <p className="text-gray-500">No Poster</p>
+                  </div>
+                )}
               </div>
               <div className="flex-grow text-center md:text-left">
                 <p className="text-xl sm:text-2xl font-bold">{gig.title}</p>
@@ -67,14 +74,23 @@ const FutureGigs = ({
                 </p>
                 <div className="mt-6">
                   {gig.ticketsUrl ? (
-                    <a
+                    <Link
                       href={gig.ticketsUrl}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-block w-full sm:w-auto text-center bg-white text-black font-bold uppercase tracking-wider px-8 py-3 rounded-md hover:bg-gray-200 transition-colors"
                     >
                       {ticketsText}
-                    </a>
+                    </Link>
+                  ) : gig.detailsUrl ? (
+                    <Link
+                      href={gig.detailsUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-block w-full sm:w-auto text-center bg-gray-600 text-white font-bold uppercase tracking-wider px-8 py-3 rounded-md hover:bg-gray-500 transition-colors"
+                    >
+                      {detailsText}
+                    </Link>
                   ) : (
                     <Link
                       href={`/gigs/archive/${gig.slug}`}
@@ -388,7 +404,25 @@ const NewsletterForm = ({ data }: { data?: NewsletterSectionData }) => {
 
 // --- MAIN HOME PAGE ---
 const LATEST_RELEASES_QUERY = `*[_type == "musicRelease"]|order(releaseDate desc)[0...10]{_id, title, "slug": slug.current, "artworkUrl": artwork.asset->url, smartLink, "trackCount": count(tracks), "firstTrackSlug": tracks[0]->slug.current}`;
-const FUTURE_GIGS_QUERY = `*[_type == "gig" && date >= now()]|order(date asc){_id, title, date, venue, city, ticketsUrl, "slug": slug.current, "posterImageUrl": posterImageUrl.asset->url}`;
+
+// UPDATED: Future Gigs Query with posterImage logic from the standalone page
+const FUTURE_GIGS_QUERY = `*[_type == "gig" && date >= now()]|order(date asc){
+  _id,
+  title,
+  date,
+  venue,
+  city,
+  ticketsUrl,
+  detailsUrl,
+  "slug": slug.current,
+  "posterImage": posterImageUrl.asset->{
+    url,
+    metadata {
+      dimensions
+    }
+  }
+}`;
+
 const VIDEOS_QUERY = `*[_type == "video"]|order(order asc){_id, title, youtubeUrl}`;
 const LATEST_POSTS_QUERY = `*[_type == "post"]|order(publishedAt desc)[0...3]{_id, title, "slug": slug.current, publishedAt, "mainImageUrl": mainImage.asset->url}`;
 const HOME_PAGE_QUERY = `*[_type == "homePage"][0]{
@@ -491,7 +525,6 @@ export default function Home() {
           </div>
         )}
 
-        {/* Затемнення фону */}
         <div className="absolute inset-0 bg-black opacity-70 md:hidden"></div>
         <div className="absolute inset-0 bg-black opacity-60 hidden md:block"></div>
 
