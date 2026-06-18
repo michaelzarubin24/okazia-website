@@ -37,6 +37,7 @@ export default async function FutureGigsPage() {
   );
 
   const headerHeight = '3.5rem';
+  // const headerHeight = '3.5rem';
 
   return (
     <div style={{ paddingTop: headerHeight }}>
