@@ -88,12 +88,12 @@ export default async function GigDetailPage({
     {
       slug: resolvedParams.slug,
     },
-    { next: { revalidate: 600 } }
+    { next: { revalidate: 300 } }
   );
   const allGigs = await client.fetch<SanityDocument[]>(
     ALL_GIGS_QUERY,
     {},
-    { next: { revalidate: 600 } }
+    { next: { revalidate: 300 } }
   );
 
   // Shuffle the related gigs for a random selection
